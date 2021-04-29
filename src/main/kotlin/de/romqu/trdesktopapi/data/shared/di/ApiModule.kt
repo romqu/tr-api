@@ -2,6 +2,7 @@ package de.romqu.trdesktopapi.data.shared.di
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import de.romqu.trdesktopapi.data.auth.account.AccountApi
+import de.romqu.trdesktopapi.data.auth.account.resetdevice.ResetDeviceApi
 import de.romqu.trdesktopapi.data.auth.login.LoginApi
 import de.romqu.trdesktopapi.data.shared.interceptor.AddAdditionalRequestHeadersInterceptor
 import de.romqu.trdesktopapi.data.shared.signrequest.SignRequestInterceptor
@@ -73,4 +74,7 @@ class ApiModule {
 
     @Bean
     fun loginApi(retrofit: Retrofit): LoginApi = retrofit.create()
+
+    @Bean
+    fun resetDeviceApi(retrofit: Retrofit): ResetDeviceApi = retrofit.create()
 }
