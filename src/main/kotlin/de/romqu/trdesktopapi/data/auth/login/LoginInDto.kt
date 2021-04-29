@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 
 @JsonDeserialize(using = DecodedJWTDeserializer::class)
 data class LoginInDto(
-    private val accountState: String,
-    private val jurisdiction: String,
-    private val refreshToken: DecodedJWT,
-    private val sessionToken: DecodedJWT,
+    val accountState: String,
+    val jurisdiction: String,
+    val refreshToken: DecodedJWT,
+    val sessionToken: DecodedJWT,
 )
