@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+}
+
+group 'de.romqu'
+version '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    implementation("org.jooq:jooq-codegen:3.14.9")
+
+}
+
+test {
+    useJUnitPlatform()
+}
