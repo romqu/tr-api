@@ -115,6 +115,21 @@ public class SessionRecordEntity extends UpdatableRecordImpl<SessionRecordEntity
     }
 
     /**
+     * Create a detached SessionRecordEntity
+     */
+    public SessionRecordEntity() {
+        super(SessionEntity.SESSION);
+    }
+
+    /**
+     * Getter for <code>public.session.reset_process_id</code>.
+     */
+    @Nullable
+    public UUID getResetProcessId() {
+        return (UUID) get(6);
+    }
+
+    /**
      * Create a detached, initialised SessionRecordEntity
      */
     public SessionRecordEntity(@NotNull Long id, @NotNull UUID uuidId, @NotNull UUID deviceId, @NotNull String token, @NotNull String refreshToken, @NotNull String trackingId, @Nullable UUID resetProcessId, @NotNull Long keypairId) {
@@ -128,21 +143,6 @@ public class SessionRecordEntity extends UpdatableRecordImpl<SessionRecordEntity
         setTrackingId(trackingId);
         setResetProcessId(resetProcessId);
         setKeypairId(keypairId);
-    }
-
-    /**
-     * Getter for <code>public.session.reset_process_id</code>.
-     */
-    @Nullable
-    public UUID getResetProcessId() {
-        return (UUID) get(6);
-    }
-
-    /**
-     * Setter for <code>public.session.reset_process_id</code>.
-     */
-    public void setResetProcessId(@Nullable UUID value) {
-        set(6, value);
     }
 
     /**
@@ -167,17 +167,17 @@ public class SessionRecordEntity extends UpdatableRecordImpl<SessionRecordEntity
     // Record8 type implementation
     // -------------------------------------------------------------------------
 
-    /**
-     * Setter for <code>public.session.keypair_id</code>.
-     */
-    public void setKeypairId(@NotNull Long value) {
-        set(7, value);
-    }
-
     @Override
     @NotNull
     public Row8<Long, UUID, UUID, String, String, String, UUID, Long> fieldsRow() {
         return (Row8) super.fieldsRow();
+    }
+
+    /**
+     * Setter for <code>public.session.reset_process_id</code>.
+     */
+    public void setResetProcessId(@Nullable UUID value) {
+        set(6, value);
     }
 
     @Override
@@ -216,16 +216,17 @@ public class SessionRecordEntity extends UpdatableRecordImpl<SessionRecordEntity
         return SessionEntity.SESSION.TRACKING_ID;
     }
 
-    @Override
-    @NotNull
-    public Row8<Long, UUID, UUID, String, String, String, UUID, Long> valuesRow() {
-        return (Row8) super.valuesRow();
+    /**
+     * Setter for <code>public.session.keypair_id</code>.
+     */
+    public void setKeypairId(@NotNull Long value) {
+        set(7, value);
     }
 
     @Override
     @NotNull
-    public Field<UUID> field7() {
-        return SessionEntity.SESSION.RESET_PROCESS_ID;
+    public Row8<Long, UUID, UUID, String, String, String, UUID, Long> valuesRow() {
+        return (Row8) super.valuesRow();
     }
 
     @Override
@@ -265,15 +266,15 @@ public class SessionRecordEntity extends UpdatableRecordImpl<SessionRecordEntity
     }
 
     @Override
-    @NotNull
-    public Field<Long> field8() {
-        return SessionEntity.SESSION.KEYPAIR_ID;
-    }
-
-    @Override
     @Nullable
     public UUID component7() {
         return getResetProcessId();
+    }
+
+    @Override
+    @NotNull
+    public Field<UUID> field7() {
+        return SessionEntity.SESSION.RESET_PROCESS_ID;
     }
 
     @Override
@@ -313,15 +314,15 @@ public class SessionRecordEntity extends UpdatableRecordImpl<SessionRecordEntity
     }
 
     @Override
-    @NotNull
-    public Long component8() {
-        return getKeypairId();
-    }
-
-    @Override
     @Nullable
     public UUID value7() {
         return getResetProcessId();
+    }
+
+    @Override
+    @NotNull
+    public Field<Long> field8() {
+        return SessionEntity.SESSION.KEYPAIR_ID;
     }
 
     @Override
@@ -368,12 +369,6 @@ public class SessionRecordEntity extends UpdatableRecordImpl<SessionRecordEntity
 
     @Override
     @NotNull
-    public Long value8() {
-        return getKeypairId();
-    }
-
-    @Override
-    @NotNull
     public SessionRecordEntity value7(@Nullable UUID value) {
         setResetProcessId(value);
         return this;
@@ -384,17 +379,6 @@ public class SessionRecordEntity extends UpdatableRecordImpl<SessionRecordEntity
     public SessionRecordEntity value8(@NotNull Long value) {
         setKeypairId(value);
         return this;
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached SessionRecordEntity
-     */
-    public SessionRecordEntity() {
-        super(SessionEntity.SESSION);
     }
 
     @Override
@@ -409,5 +393,21 @@ public class SessionRecordEntity extends UpdatableRecordImpl<SessionRecordEntity
         value7(value7);
         value8(value8);
         return this;
+    }
+
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
+    @Override
+    @NotNull
+    public Long component8() {
+        return getKeypairId();
+    }
+
+    @Override
+    @NotNull
+    public Long value8() {
+        return getKeypairId();
     }
 }

@@ -19,9 +19,9 @@ public class SessionEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final Long   id;
-    private final UUID   uuidId;
-    private final UUID   deviceId;
+    private final Long id;
+    private final UUID uuidId;
+    private final UUID deviceId;
     private final String token;
     private final String refreshToken;
     private final String trackingId;
