@@ -18,7 +18,6 @@ class AddAdditionalRequestHeadersInterceptor : Interceptor {
             addHeader("X-Zeta-Platform", "android")
             addHeader("X-Zeta-Platform-Version", "30")
             addHeader("X-Zeta-App-Version", "1.1.5486")
-
         }.build()
 
         return chain.proceed(newRequest)

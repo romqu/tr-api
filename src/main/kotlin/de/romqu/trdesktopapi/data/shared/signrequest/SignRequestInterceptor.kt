@@ -17,7 +17,7 @@ const val HEADER_SESSION_ID = "session-id"
 @Component
 class SignRequestInterceptor(
     private val keypairRepository: KeypairRepository,
-    private val sessionRepository: SessionRepository
+    private val sessionRepository: SessionRepository,
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -30,27 +30,36 @@ class SignRequestInterceptor(
             request.header(HEADER_SESSION_ID)!!.toLong()
         )
 
-        val keypair = keypairRepository.getById(session.keypairId)
+        val keypair = keypairRepository.getById(session!!.keypairId)!!
 
         val deviceIdValue = session.deviceId.toString()
-        val privateKey = keyFactory.generatePrivate(
-            PKCS8EncodedKeySpec(keypair.privateKey)
-        )
-        val requestBodyValue = request.body.asString()
 
-        val signature = ApiRequestSignerUtil.sign(
-            "$timestamp.$requestBodyValue",
-            privateKey,
-            SIGN_ALGORITHM
-        )
 
-        val newRequest = chain.request().newBuilder().apply {
-            addHeader("X-Zeta-Device-Id", deviceIdValue)
-            addHeader("X-Zeta-Timestamp", timestamp)
-            addHeader("X-Zeta-Signature", signature!!)
-            addHeader("X-Zeta-Tracking-Id", session.trackingId)
-            removeHeader(HEADER_SESSION_ID)
-        }.build()
+        val newRequest = if (!request.url.toString().contains("/api/v1/auth/account/reset/device")) {
+            val privateKey = keyFactory.generatePrivate(
+                PKCS8EncodedKeySpec(keypair.privateKey)
+            )
+            val requestBodyValue = request.body.asString()
+
+            val signature = ApiRequestSignerUtil.sign(
+                "$timestamp.$requestBodyValue",
+                privateKey,
+                SIGN_ALGORITHM
+            )
+
+            chain.request().newBuilder().apply {
+                addHeader("X-Zeta-Device-Id", deviceIdValue)
+                addHeader("X-Zeta-Timestamp", timestamp)
+                addHeader("X-Zeta-Signature", signature!!)
+                addHeader("X-Zeta-Tracking-Id", session.trackingId)
+                removeHeader(HEADER_SESSION_ID)
+            }.build()
+        } else {
+            chain.request().newBuilder().apply {
+                addHeader("X-Zeta-Device-Id", deviceIdValue)
+                addHeader("X-Zeta-Tracking-Id", session.trackingId)
+            }.build()
+        }
 
         return chain.proceed(newRequest)
     }

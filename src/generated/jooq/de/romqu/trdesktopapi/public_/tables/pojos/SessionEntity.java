@@ -4,10 +4,11 @@
 package de.romqu.trdesktopapi.public_.tables.pojos;
 
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Serializable;
 import java.util.UUID;
-
-import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -24,7 +25,8 @@ public class SessionEntity implements Serializable {
     private final String token;
     private final String refreshToken;
     private final String trackingId;
-    private final Long   keypairId;
+    private final UUID resetProcessId;
+    private final Long keypairId;
 
     public SessionEntity(SessionEntity value) {
         this.id = value.id;
@@ -33,17 +35,19 @@ public class SessionEntity implements Serializable {
         this.token = value.token;
         this.refreshToken = value.refreshToken;
         this.trackingId = value.trackingId;
+        this.resetProcessId = value.resetProcessId;
         this.keypairId = value.keypairId;
     }
 
     public SessionEntity(
-        @NotNull Long   id,
-        @NotNull UUID   uuidId,
-        @NotNull UUID   deviceId,
-        @NotNull String token,
-        @NotNull String refreshToken,
-        @NotNull String trackingId,
-        @NotNull Long   keypairId
+            @NotNull Long id,
+            @NotNull UUID uuidId,
+            @NotNull UUID deviceId,
+            @NotNull String token,
+            @NotNull String refreshToken,
+            @NotNull String trackingId,
+            @Nullable UUID resetProcessId,
+            @NotNull Long keypairId
     ) {
         this.id = id;
         this.uuidId = uuidId;
@@ -51,6 +55,7 @@ public class SessionEntity implements Serializable {
         this.token = token;
         this.refreshToken = refreshToken;
         this.trackingId = trackingId;
+        this.resetProcessId = resetProcessId;
         this.keypairId = keypairId;
     }
 
@@ -103,6 +108,14 @@ public class SessionEntity implements Serializable {
     }
 
     /**
+     * Getter for <code>public.session.reset_process_id</code>.
+     */
+    @Nullable
+    public UUID getResetProcessId() {
+        return this.resetProcessId;
+    }
+
+    /**
      * Getter for <code>public.session.keypair_id</code>.
      */
     @NotNull
@@ -120,6 +133,7 @@ public class SessionEntity implements Serializable {
         sb.append(", ").append(token);
         sb.append(", ").append(refreshToken);
         sb.append(", ").append(trackingId);
+        sb.append(", ").append(resetProcessId);
         sb.append(", ").append(keypairId);
 
         sb.append(")");

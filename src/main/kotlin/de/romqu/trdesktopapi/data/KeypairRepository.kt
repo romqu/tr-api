@@ -6,9 +6,6 @@ import de.romqu.trdesktopapi.public_.tables.KeypairEntity.KEYPAIR
 import de.romqu.trdesktopapi.public_.tables.daos.KeypairDaoEntity
 import de.romqu.trdesktopapi.public_.tables.pojos.KeypairEntity
 import org.jooq.DSLContext
-import org.jooq.Field
-import org.jooq.Record
-import org.jooq.Table
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -17,7 +14,7 @@ class KeypairRepository(
     private val db: DSLContext,
 ) {
 
-    fun getById(id: Long): KeypairEntity =
+    fun getById(id: Long): KeypairEntity? =
         dao.fetchOneByIdEntity(id)
 
     fun save(entity: KeypairEntity): KeypairEntity {

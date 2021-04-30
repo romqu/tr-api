@@ -4,14 +4,11 @@ import de.romqu.trdesktopapi.data.KeypairRepository
 import de.romqu.trdesktopapi.data.SessionRepository
 import de.romqu.trdesktopapi.data.auth.account.AccountRepository
 import de.romqu.trdesktopapi.data.auth.account.AuthenticateAccountOutDto
-import de.romqu.trdesktopapi.data.auth.login.LoginOutDto
-import de.romqu.trdesktopapi.data.auth.login.LoginRepository
 import de.romqu.trdesktopapi.data.shared.ApiCallError
 import de.romqu.trdesktopapi.data.shared.extension.asX962
 import de.romqu.trdesktopapi.public_.tables.pojos.KeypairEntity
 import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity
 import de.romqu.trdesktopapi.shared.Result
-import de.romqu.trdesktopapi.shared.flatMap
 import de.romqu.trdesktopapi.shared.map
 import org.springframework.stereotype.Service
 import java.util.*
@@ -26,7 +23,7 @@ class AuthenticateAccountService(
 
     suspend fun execute(
         phoneNumber: Long,
-    ) = createSession()
+    ): Result<ApiCallError, UUID> = createSession()
         .authenticateAccount(phoneNumber)
 
 
@@ -41,6 +38,7 @@ class AuthenticateAccountService(
             "",
             "",
             "",
+            null,
             savedKeypairEntity.id,
         )
         return FirstOut(sessionRepository.save(sessionEntity), savedKeypairEntity)
@@ -50,14 +48,14 @@ class AuthenticateAccountService(
 
     private suspend fun FirstOut.authenticateAccount(
         phoneNumber: Long,
-    ): Result<ApiCallError, FirstOut> {
+    ): Result<ApiCallError, UUID> {
 
         val deviceKey = keypairEntity.publicKey.asX962()
 
         val dto = AuthenticateAccountOutDto(deviceKey, jurisdiction = "DE", phoneNumber = "+49$phoneNumber")
 
         return accountRepository.authenticate(dto, sessionEntity.id)
-            .map { this }
+            .map { sessionEntity.uuidId }
     }
 
 }

@@ -55,8 +55,8 @@ class ApiModule {
             proxy(proxy)
             sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
             hostnameVerifier { _, _ -> true }.build()
-            addInterceptor(addAdditionalRequestHeadersInterceptor)
             addInterceptor(signRequestInterceptor)
+            addInterceptor(addAdditionalRequestHeadersInterceptor)
         }.build()
     }
 

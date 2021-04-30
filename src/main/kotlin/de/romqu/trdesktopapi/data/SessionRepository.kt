@@ -3,7 +3,6 @@ package de.romqu.trdesktopapi.data
 import de.romqu.trdesktopapi.data.shared.insertReturningId
 import de.romqu.trdesktopapi.public_.tables.SessionEntity.SESSION
 import de.romqu.trdesktopapi.public_.tables.daos.SessionDaoEntity
-import de.romqu.trdesktopapi.public_.tables.pojos.KeypairEntity
 import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
@@ -15,10 +14,10 @@ class SessionRepository(
     private val db: DSLContext
 ) {
 
-    fun getById(id: Long): SessionEntity =
+    fun getById(id: Long): SessionEntity? =
         dao.fetchOneByIdEntity(id)
 
-    fun getByUuid(uuid: UUID): SessionEntity =
+    fun getByUuid(uuid: UUID): SessionEntity? =
         dao.fetchOneByUuidIdEntity(uuid)
 
     fun save(entity: SessionEntity): SessionEntity {
@@ -49,6 +48,7 @@ class SessionRepository(
                 token,
                 refreshToken,
                 trackingId,
+                resetProcessId,
                 keypairId,
             )
         }

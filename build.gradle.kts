@@ -89,6 +89,8 @@ jooq {
                         isDeprecated = false
                         isRecords = true
                         isNonnullAnnotation = true
+                        isNullableAnnotation = true
+                        withNullableAnnotationType("org.jetbrains.annotations.Nullable")
                         withNonnullAnnotationType("org.jetbrains.annotations.NotNull")
                         isImmutablePojos = true
                         isPojosAsJavaRecordClasses = true
