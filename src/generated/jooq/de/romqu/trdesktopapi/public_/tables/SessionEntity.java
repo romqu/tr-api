@@ -59,17 +59,17 @@ public class SessionEntity extends TableImpl<SessionRecordEntity> {
     /**
      * The column <code>public.session.token</code>.
      */
-    public final TableField<SessionRecordEntity, String> TOKEN = createField(DSL.name("token"), SQLDataType.VARCHAR(100).nullable(false), this, "");
+    public final TableField<SessionRecordEntity, String> TOKEN = createField(DSL.name("token"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
      * The column <code>public.session.refresh_token</code>.
      */
-    public final TableField<SessionRecordEntity, String> REFRESH_TOKEN = createField(DSL.name("refresh_token"), SQLDataType.VARCHAR(100).nullable(false), this, "");
+    public final TableField<SessionRecordEntity, String> REFRESH_TOKEN = createField(DSL.name("refresh_token"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
      * The column <code>public.session.tracking_id</code>.
      */
-    public final TableField<SessionRecordEntity, String> TRACKING_ID = createField(DSL.name("tracking_id"), SQLDataType.VARCHAR(100).nullable(false), this, "");
+    public final TableField<SessionRecordEntity, String> TRACKING_ID = createField(DSL.name("tracking_id"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
      * The column <code>public.session.reset_process_id</code>.

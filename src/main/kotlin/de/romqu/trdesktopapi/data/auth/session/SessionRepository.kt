@@ -1,4 +1,4 @@
-package de.romqu.trdesktopapi.data
+package de.romqu.trdesktopapi.data.auth.session
 
 import de.romqu.trdesktopapi.data.shared.insertReturningId
 import de.romqu.trdesktopapi.public_.tables.SessionEntity.SESSION
@@ -11,8 +11,11 @@ import java.util.*
 @Repository
 class SessionRepository(
     private val dao: SessionDaoEntity,
-    private val db: DSLContext
+    private val sessionApi: SessionApi,
+    private val db: DSLContext,
 ) {
+
+    suspend fun getRemote(sessionId: Long) = sessionApi.getSessionToken(sessionId)
 
     fun getById(id: Long): SessionEntity? =
         dao.fetchOneByIdEntity(id)
@@ -58,7 +61,7 @@ class SessionRepository(
         dao.update(entity)
     }
 
-    fun deleteAll(){
+    fun deleteAll() {
         db.delete(SESSION).execute()
     }
 }

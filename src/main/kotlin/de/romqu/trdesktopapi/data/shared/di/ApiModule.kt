@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import de.romqu.trdesktopapi.data.auth.account.AccountApi
 import de.romqu.trdesktopapi.data.auth.account.resetdevice.ResetDeviceApi
 import de.romqu.trdesktopapi.data.auth.login.LoginApi
+import de.romqu.trdesktopapi.data.auth.session.AddRefreshTokenInterceptor
+import de.romqu.trdesktopapi.data.auth.session.SessionApi
 import de.romqu.trdesktopapi.data.shared.interceptor.AddAdditionalRequestHeadersInterceptor
 import de.romqu.trdesktopapi.data.shared.signrequest.SignRequestInterceptor
 import okhttp3.OkHttpClient
@@ -60,6 +62,7 @@ class ApiModule {
     fun okHttpClientWebsocket(
         addAdditionalRequestHeadersInterceptor: AddAdditionalRequestHeadersInterceptor,
         signRequestInterceptor: SignRequestInterceptor,
+        addRefreshTokenInterceptor: AddRefreshTokenInterceptor,
     ): OkHttpClient {
 
         val sslContext = SSLContext.getInstance("SSL")
@@ -83,6 +86,7 @@ class ApiModule {
             pingInterval(5, TimeUnit.SECONDS)
             addInterceptor(signRequestInterceptor)
             addInterceptor(addAdditionalRequestHeadersInterceptor)
+            addInterceptor(addRefreshTokenInterceptor)
         }.build()
     }
 
@@ -113,4 +117,7 @@ class ApiModule {
 
     @Bean
     fun resetDeviceApi(retrofit: Retrofit): ResetDeviceApi = retrofit.create()
+
+    @Bean
+    fun sessionApi(retrofit: Retrofit): SessionApi = retrofit.create()
 }

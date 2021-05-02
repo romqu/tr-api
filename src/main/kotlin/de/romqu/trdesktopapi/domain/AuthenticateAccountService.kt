@@ -1,9 +1,9 @@
 package de.romqu.trdesktopapi.domain
 
 import de.romqu.trdesktopapi.data.KeypairRepository
-import de.romqu.trdesktopapi.data.SessionRepository
 import de.romqu.trdesktopapi.data.auth.account.AccountRepository
 import de.romqu.trdesktopapi.data.auth.account.AuthenticateAccountOutDto
+import de.romqu.trdesktopapi.data.auth.session.SessionRepository
 import de.romqu.trdesktopapi.data.shared.ApiCallError
 import de.romqu.trdesktopapi.data.shared.extension.asX962
 import de.romqu.trdesktopapi.public_.tables.pojos.KeypairEntity

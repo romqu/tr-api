@@ -1,11 +1,12 @@
 package de.romqu.trdesktopapi.data.shared.signrequest
 
 import de.romqu.trdesktopapi.data.KeypairRepository
-import de.romqu.trdesktopapi.data.SessionRepository
+import de.romqu.trdesktopapi.data.auth.session.SessionRepository
 import okhttp3.Interceptor
 import okhttp3.RequestBody
 import okhttp3.Response
 import okio.Buffer
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 import java.io.IOException
 import java.security.KeyFactory
@@ -17,6 +18,7 @@ const val HEADER_SESSION_ID = "session-id"
 @Component
 class SignRequestInterceptor(
     private val keypairRepository: KeypairRepository,
+    @Lazy
     private val sessionRepository: SessionRepository,
 ) : Interceptor {
 

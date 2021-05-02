@@ -1,15 +1,12 @@
-package de.romqu.trdesktopapi.data.auth.login
+package de.romqu.trdesktopapi.data.auth.session
 
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import java.util.*
+import de.romqu.trdesktopapi.data.auth.login.DecodedJWTDeserializer
 
-data class LoginInDto(
-    @JsonDeserialize(using = DecodedJWTDeserializer::class)
-    val refreshToken: DecodedJWT,
+data class SessionTokenInDto(
     @JsonDeserialize(using = DecodedJWTDeserializer::class)
     val sessionToken: DecodedJWT,
     val accountState: String,
     val jurisdiction: String,
-    val trackingId: UUID,
 )

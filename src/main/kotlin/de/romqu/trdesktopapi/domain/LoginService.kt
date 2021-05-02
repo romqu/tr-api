@@ -1,12 +1,12 @@
 package de.romqu.trdesktopapi.domain
 
-import de.romqu.trdesktopapi.data.SessionRepository
 import de.romqu.trdesktopapi.data.auth.account.resetdevice.ResetDeviceRepository
 import de.romqu.trdesktopapi.data.auth.account.resetdevice.request.RequestResetDeviceInDto
 import de.romqu.trdesktopapi.data.auth.account.resetdevice.request.RequestResetDeviceOutDto
 import de.romqu.trdesktopapi.data.auth.login.LoginInDto
 import de.romqu.trdesktopapi.data.auth.login.LoginOutDto
 import de.romqu.trdesktopapi.data.auth.login.LoginRepository
+import de.romqu.trdesktopapi.data.auth.session.SessionRepository
 import de.romqu.trdesktopapi.data.shared.ApiCallError
 import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity
 import de.romqu.trdesktopapi.shared.Result
@@ -36,7 +36,7 @@ class LoginService(
         session: SessionEntity,
     ): Result<ApiCallError, LoginInDto> = loginRepository.login(
         LoginOutDto(
-            phoneNumber, pinNumber
+            "+49$phoneNumber", pinNumber
         ), session.id
     )
 
@@ -52,7 +52,7 @@ class LoginService(
                 dto.sessionToken.token,
                 dto.refreshToken.token,
                 dto.trackingId.toString(),
-                resetProcessId,
+                null,
                 keypairId,
             )
         }

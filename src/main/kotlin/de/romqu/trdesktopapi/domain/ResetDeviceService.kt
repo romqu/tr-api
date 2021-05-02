@@ -1,9 +1,9 @@
 package de.romqu.trdesktopapi.domain
 
 import de.romqu.trdesktopapi.data.KeypairRepository
-import de.romqu.trdesktopapi.data.SessionRepository
 import de.romqu.trdesktopapi.data.auth.account.resetdevice.ResetDeviceOutDto
 import de.romqu.trdesktopapi.data.auth.account.resetdevice.ResetDeviceRepository
+import de.romqu.trdesktopapi.data.auth.session.SessionRepository
 import de.romqu.trdesktopapi.data.shared.ApiCallError
 import de.romqu.trdesktopapi.data.shared.extension.asX962
 import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity
@@ -17,7 +17,7 @@ class ResetDeviceService(
     private val resetDeviceRepository: ResetDeviceRepository,
 ) {
 
-    suspend fun execute(code: Int, session: SessionEntity): Result<ApiCallError, Unit> =
+    suspend fun execute(code: String, session: SessionEntity): Result<ApiCallError, Unit> =
         getDeviceKey(session)
             .resetDevice(code, session)
             .resetProcessIdFromSession(session)
@@ -26,7 +26,7 @@ class ResetDeviceService(
         keypairRepository.getById(session.keypairId)!!.publicKey.asX962()
 
     private suspend fun String.resetDevice(
-        code: Int,
+        code: String,
         session: SessionEntity,
     ): Result<ApiCallError, Unit> = resetDeviceRepository.resetDevice(
         ResetDeviceOutDto(code, this),
