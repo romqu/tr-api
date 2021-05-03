@@ -34,6 +34,7 @@ class ApiModule {
     fun okHttpClientApi(
         addAdditionalRequestHeadersInterceptor: AddAdditionalRequestHeadersInterceptor,
         signRequestInterceptor: SignRequestInterceptor,
+        addRefreshTokenInterceptor: AddRefreshTokenInterceptor,
     ): OkHttpClient {
 
         val trustAllCerts = trustAllCerts()
@@ -53,6 +54,7 @@ class ApiModule {
             proxy(proxy)
             sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
             hostnameVerifier { _, _ -> true }.build()
+            addInterceptor(addRefreshTokenInterceptor)
             addInterceptor(signRequestInterceptor)
             addInterceptor(addAdditionalRequestHeadersInterceptor)
         }.build()
@@ -60,9 +62,6 @@ class ApiModule {
 
     @Bean(WEB_SOCKET_CLIENT)
     fun okHttpClientWebsocket(
-        addAdditionalRequestHeadersInterceptor: AddAdditionalRequestHeadersInterceptor,
-        signRequestInterceptor: SignRequestInterceptor,
-        addRefreshTokenInterceptor: AddRefreshTokenInterceptor,
     ): OkHttpClient {
 
         val sslContext = SSLContext.getInstance("SSL")
@@ -84,9 +83,6 @@ class ApiModule {
             readTimeout(0, TimeUnit.MILLISECONDS)
             connectTimeout(0, TimeUnit.MILLISECONDS)
             pingInterval(5, TimeUnit.SECONDS)
-            addInterceptor(signRequestInterceptor)
-            addInterceptor(addAdditionalRequestHeadersInterceptor)
-            addInterceptor(addRefreshTokenInterceptor)
         }.build()
     }
 

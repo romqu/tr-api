@@ -1,12 +1,11 @@
 package de.romqu.trdesktopapi.data.auth.session
 
+import de.romqu.trdesktopapi.data.shared.signrequest.HEADER_SESSION_ID
 import okhttp3.Interceptor
 import okhttp3.Response
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 
-const val SIGN_ALGORITHM = "SHA512withECDSA"
-const val HEADER_SESSION_ID = "session-id"
 
 @Component
 class AddRefreshTokenInterceptor(

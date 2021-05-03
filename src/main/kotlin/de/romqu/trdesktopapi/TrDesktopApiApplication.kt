@@ -8,8 +8,10 @@ import de.romqu.trdesktopapi.data.shared.signrequest.HEADER_SESSION_ID
 import de.romqu.trdesktopapi.domain.AuthenticateAccountService
 import de.romqu.trdesktopapi.domain.LoginService
 import de.romqu.trdesktopapi.domain.ResetDeviceService
+import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.WebSocket
@@ -28,17 +30,15 @@ class TrDesktopApiApplication(
     private val loginService: LoginService,
     private val resetDeviceService: ResetDeviceService,
     private val objectMapper: ObjectMapper,
-    @Qualifier(WEB_SOCKET_CLIENT) client: OkHttpClient,
+    @Qualifier(WEB_SOCKET_CLIENT) private val client: OkHttpClient,
 ) {
 
 
     init {
-        //sessionRepository.deleteAll()
-        // login()
+        sessionRepository.deleteAll()
+        login()
         websocket(client)
         // client.dispatcher.executorService.shutdown()
-
-
     }
 
     private fun login() {
@@ -55,17 +55,18 @@ class TrDesktopApiApplication(
 
                     resetDeviceService.execute(code, session1)
                     loginService.execute(15783936784, 4289, session1)
+
                 }, {})
         }
     }
 
     private fun websocket(client: OkHttpClient) {
         val request = Request.Builder()
-            .addHeader(HEADER_SESSION_ID, "1")
+            .addHeader(HEADER_SESSION_ID, "3")
             .url("wss://api.traderepublic.com")
             .build()
 
-        val session = sessionRepository.getById(1)
+        val session = sessionRepository.getById(3)
         val device = session!!.deviceId
         val token = session.token
 
@@ -79,15 +80,28 @@ class TrDesktopApiApplication(
 
                 if (text.contains("AUTHENTICATION_ERROR") && text.contains("Unauthorized")) {
 
-                    GlobalScope.launch {
+                    runBlocking {
                         val sessionTokenInDto = sessionRepository.getRemote(webSocket.request().header(
                             HEADER_SESSION_ID)!!.toLong()
                         )
                         val tokenValue = objectMapper.readTree(text).get("token")
-                        tokenValue
-                    }
+                        val currentSession = sessionRepository.getById(webSocket.request().header(
+                            HEADER_SESSION_ID)!!.toLong()
+                        )!!
 
-                    super.onMessage(webSocket, text)
+                        with(currentSession) {
+                            SessionEntity(id,
+                                uuidId,
+                                deviceId,
+                                tokenValue.textValue(),
+                                refreshToken,
+                                trackingId,
+                                resetProcessId,
+                                keypairId)
+                        }
+
+                        super.onMessage(webSocket, text)
+                    }
 
                 } else super.onMessage(webSocket, text)
             }
