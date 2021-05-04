@@ -42,6 +42,8 @@ dependencies {
 
     implementation("com.auth0:java-jwt:3.15.0")
     implementation("org.bouncycastle:bcprov-jdk15on:1.68")
+
+    implementation("com.github.ben-manes.caffeine:caffeine:3.0.2")
 }
 
 tasks.withType<KotlinCompile> {

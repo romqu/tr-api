@@ -8,6 +8,7 @@ import de.romqu.trdesktopapi.data.auth.login.LoginOutDto
 import de.romqu.trdesktopapi.data.auth.login.LoginRepository
 import de.romqu.trdesktopapi.data.auth.session.SessionRepository
 import de.romqu.trdesktopapi.data.shared.ApiCallError
+import de.romqu.trdesktopapi.data.websocket.WebsocketRepository
 import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity
 import de.romqu.trdesktopapi.shared.Result
 import de.romqu.trdesktopapi.shared.map
@@ -18,6 +19,7 @@ class LoginService(
     private val sessionRepository: SessionRepository,
     private val loginRepository: LoginRepository,
     private val resetDeviceRepository: ResetDeviceRepository,
+    private val websocketRepository: WebsocketRepository,
 ) {
 
     suspend fun execute(phoneNumber: Long, pinNumber: Int, session: SessionEntity): Result<ApiCallError, Unit> =
