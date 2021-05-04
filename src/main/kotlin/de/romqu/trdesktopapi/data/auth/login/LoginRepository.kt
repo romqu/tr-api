@@ -5,14 +5,15 @@ import de.romqu.trdesktopapi.data.shared.ApiCallDelegate
 import de.romqu.trdesktopapi.data.shared.ApiCallError
 import de.romqu.trdesktopapi.shared.Result
 import org.springframework.stereotype.Repository
+import java.util.*
 
 @Repository
 class LoginRepository(
     private val api: LoginApi,
     private val apiCallDelegate: ApiCallDelegate,
-): ApiCall by apiCallDelegate{
+): ApiCall by apiCallDelegate {
 
-    suspend fun login(dto: LoginOutDto, sessionId: Long): Result<ApiCallError, LoginInDto> =
-        makeApiCallWith { api.login(dto, sessionId) }
+    suspend fun login(dto: LoginOutDto, sessionId: UUID): Result<ApiCallError, LoginInDto> =
+        makeApiCallWith { api.login(dto, sessionId.toString()) }
 
 }

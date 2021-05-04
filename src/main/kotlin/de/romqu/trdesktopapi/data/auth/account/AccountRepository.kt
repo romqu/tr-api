@@ -5,6 +5,7 @@ import de.romqu.trdesktopapi.data.shared.ApiCallDelegate
 import de.romqu.trdesktopapi.data.shared.ApiCallError
 import de.romqu.trdesktopapi.shared.Result
 import org.springframework.stereotype.Repository
+import java.util.*
 
 @Repository
 class AccountRepository(
@@ -14,8 +15,8 @@ class AccountRepository(
 
     suspend fun authenticate(
         dto: AuthenticateAccountOutDto,
-        sessionId: Long
+        sessionId: UUID,
     ): Result<ApiCallError, Unit> =
-        makeApiCallWith { api.authenticate(dto, sessionId) }
+        makeApiCallWith { api.authenticate(dto, sessionId.toString()) }
 
 }

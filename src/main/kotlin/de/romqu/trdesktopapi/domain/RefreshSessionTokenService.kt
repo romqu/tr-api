@@ -19,7 +19,7 @@ class RefreshSessionTokenService(
 
     private fun refreshSessionToken(authErrorStream: Flow<AuthErrorInDto>) {
         authErrorStream.map {
-            val sessionTokenInDto = sessionRepository.getRemote(it.sessionId)
+            val sessionTokenInDto = sessionRepository.getRemote(it.sessionId.toString())
 
             val currentSession = sessionRepository.getByUuid(it.sessionId)!!
 

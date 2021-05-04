@@ -7,6 +7,7 @@ import de.romqu.trdesktopapi.data.shared.ApiCallDelegate
 import de.romqu.trdesktopapi.data.shared.ApiCallError
 import de.romqu.trdesktopapi.shared.Result
 import org.springframework.stereotype.Repository
+import java.util.*
 
 @Repository
 class ResetDeviceRepository(
@@ -16,15 +17,15 @@ class ResetDeviceRepository(
 
     suspend fun requestResetDevice(
         dto: RequestResetDeviceOutDto,
-        sessionId: Long,
+        sessionId: UUID,
     ): Result<ApiCallError, RequestResetDeviceInDto> =
-        makeApiCallWith { api.requestReset(dto, sessionId) }
+        makeApiCallWith { api.requestReset(dto, sessionId.toString()) }
 
 
     suspend fun resetDevice(
         dto: ResetDeviceOutDto,
-        sessionId: Long,
+        sessionId: UUID,
         processId: String,
     ): Result<ApiCallError, Unit> =
-        makeApiCallWith { api.reset(dto, processId, sessionId) }
+        makeApiCallWith { api.reset(dto, processId, sessionId.toString()) }
 }

@@ -19,8 +19,8 @@ class AddRefreshTokenInterceptor(
 
         val newRequest = if (request.url.toString().contains(SESSION_ENDPOINT)) {
 
-            val session = sessionRepository.getById(
-                request.header(HEADER_SESSION_ID)!!.toLong()
+            val session = sessionRepository.getByUuid(
+                request.header(HEADER_SESSION_ID)!!
             )
 
             if (session?.refreshToken != null) {

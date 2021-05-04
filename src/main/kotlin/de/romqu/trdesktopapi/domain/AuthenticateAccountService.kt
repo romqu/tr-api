@@ -54,7 +54,7 @@ class AuthenticateAccountService(
 
         val dto = AuthenticateAccountOutDto(deviceKey, jurisdiction = "DE", phoneNumber = "+49$phoneNumber")
 
-        return accountRepository.authenticate(dto, sessionEntity.id)
+        return accountRepository.authenticate(dto, sessionEntity.uuidId)
             .map { sessionEntity.uuidId }
     }
 

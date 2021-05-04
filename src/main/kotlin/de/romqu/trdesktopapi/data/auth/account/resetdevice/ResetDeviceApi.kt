@@ -16,13 +16,13 @@ interface ResetDeviceApi {
     @POST("/api/v1/auth/account/reset/device")
     suspend fun requestReset(
         @Body dto: RequestResetDeviceOutDto,
-        @Header(HEADER_SESSION_ID) sessionId: Long,
+        @Header(HEADER_SESSION_ID) sessionId: String,
     ): Response<RequestResetDeviceInDto>
 
     @POST("/api/v1/auth/account/reset/device/{$PATH_PROCESS_ID}/key")
     suspend fun reset(
         @Body dto: ResetDeviceOutDto,
         @Path(PATH_PROCESS_ID) processId: String,
-        @Header(HEADER_SESSION_ID) sessionId: Long,
+        @Header(HEADER_SESSION_ID) sessionId: String,
     ): Response<Unit>
 }

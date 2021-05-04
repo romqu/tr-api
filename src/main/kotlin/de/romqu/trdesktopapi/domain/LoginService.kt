@@ -39,7 +39,7 @@ class LoginService(
     ): Result<ApiCallError, LoginInDto> = loginRepository.login(
         LoginOutDto(
             "+49$phoneNumber", pinNumber
-        ), session.id
+        ), session.uuidId
     )
 
     private fun updateSessionWithTokens(
@@ -69,7 +69,7 @@ class LoginService(
     ): Result<ApiCallError, RequestResetDeviceInDto> =
         resetDeviceRepository.requestResetDevice(RequestResetDeviceOutDto(
             "+49$phoneNumber", pinNumber
-        ), session.id)
+        ), session.uuidId)
 
     private fun Result<ApiCallError, RequestResetDeviceInDto>.updateSessionWithResetProcessId(
         session: SessionEntity,

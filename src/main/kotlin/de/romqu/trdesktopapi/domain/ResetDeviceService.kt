@@ -30,7 +30,7 @@ class ResetDeviceService(
         session: SessionEntity,
     ): Result<ApiCallError, Unit> = resetDeviceRepository.resetDevice(
         ResetDeviceOutDto(code, this),
-        session.id,
+        session.uuidId,
         session.resetProcessId!!.toString()
     )
 

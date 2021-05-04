@@ -28,8 +28,8 @@ class SignRequestInterceptor(
         val keyFactory = KeyFactory.getInstance("EC")
         val timestamp = System.currentTimeMillis().toString()
 
-        val session = sessionRepository.getById(
-            request.header(HEADER_SESSION_ID)!!.toLong()
+        val session = sessionRepository.getByUuid(
+            request.header(HEADER_SESSION_ID)!!
         )
 
         val keypair = keypairRepository.getById(session!!.keypairId)!!

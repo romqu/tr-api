@@ -64,10 +64,11 @@ class WebsocketRepository(
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
-            val sessionId = webSocket.request().header(HEADER_SESSION_ID)
+            val sessionUuid = webSocket.request().header(
+                HEADER_SESSION_ID)
             val subscriptionNumber = subscriptionNumberMatcher.find(text)
             val dtoValue = bodyMatcher.find(text)?.value
-            val dtoType = mapperTypeCache.getIfPresent("$sessionId$subscriptionNumber")
+            val dtoType = mapperTypeCache.getIfPresent("$sessionUuid$subscriptionNumber")
 
 
             // TODO: move session token refresh into task via error broadcast
@@ -82,11 +83,9 @@ class WebsocketRepository(
             } else if (text.contains("AUTHENTICATION_ERROR") && text.contains("Unauthorized")) {
 
                 runBlocking {
-                    val sessionTokenInDto = sessionRepository.getRemote(webSocket.request().header(
-                        HEADER_SESSION_ID)!!.toLong()
+                    val sessionTokenInDto = sessionRepository.getRemote(sessionUuid!!
                     )
-                    val currentSession = sessionRepository.getById(webSocket.request().header(
-                        HEADER_SESSION_ID)!!.toLong()
+                    val currentSession = sessionRepository.getByUuid(sessionUuid
                     )!!
 
                     sessionRepository.update(with(currentSession) {

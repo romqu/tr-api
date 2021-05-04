@@ -10,6 +10,6 @@ interface LoginApi {
     @POST("/api/v1/auth/login")
     suspend fun login(
         @Body dto: LoginOutDto,
-        @Header(HEADER_SESSION_ID) sessionId: Long,
+        @Header(HEADER_SESSION_ID) sessionId: String,
     ): Response<LoginInDto>
 }
