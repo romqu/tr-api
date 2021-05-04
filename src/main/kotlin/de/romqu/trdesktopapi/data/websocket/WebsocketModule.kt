@@ -3,6 +3,7 @@ package de.romqu.trdesktopapi.data.websocket
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import de.romqu.trdesktopapi.data.shared.di.WEB_SOCKET_CLIENT
+import kotlinx.coroutines.flow.MutableSharedFlow
 import okhttp3.OkHttpClient
 import okhttp3.WebSocket
 import org.springframework.context.annotation.Bean
@@ -17,6 +18,12 @@ import javax.net.ssl.X509TrustManager
 
 @Component
 class WebsocketModule {
+
+    @Bean
+    fun getMapperTypeCache(): Cache<String, WebsocketDtoType> = Caffeine.newBuilder().build()
+
+    @Bean
+    fun getDtoBroadcastStream() = MutableSharedFlow<Any>()
 
     @Bean
     fun cache(): Cache<Long, WebSocket> =

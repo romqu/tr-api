@@ -35,10 +35,10 @@ class TrDesktopApiApplication(
 
 
     init {
-        sessionRepository.deleteAll()
+        /*sessionRepository.deleteAll()
         login()
         websocket(client)
-        // client.dispatcher.executorService.shutdown()
+        */// client.dispatcher.executorService.shutdown()
     }
 
     private fun login() {
@@ -99,11 +99,9 @@ class TrDesktopApiApplication(
                                 resetProcessId,
                                 keypairId)
                         }
-
-                        super.onMessage(webSocket, text)
                     }
 
-                } else super.onMessage(webSocket, text)
+                }
             }
         })
 

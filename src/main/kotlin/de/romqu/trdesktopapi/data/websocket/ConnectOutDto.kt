@@ -9,4 +9,7 @@ class ConnectOutDto(
     val locale: String,
     val platformId: String,
     val platformVersion: Int,
-)
+) : WebsocketOutDto {
+    override val type: WebsocketDtoType
+        get() = WebsocketDtoType.CONNECT
+}
