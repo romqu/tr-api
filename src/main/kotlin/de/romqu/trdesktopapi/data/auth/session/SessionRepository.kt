@@ -15,7 +15,7 @@ class SessionRepository(
     private val db: DSLContext,
 ) {
 
-    suspend fun getRemote(sessionId: Long) = sessionApi.getSessionToken(sessionId)
+    suspend fun getRemote(sessionId: UUID) = sessionApi.getSessionToken(sessionId)
 
     fun getById(id: Long): SessionEntity? =
         dao.fetchOneByIdEntity(id)

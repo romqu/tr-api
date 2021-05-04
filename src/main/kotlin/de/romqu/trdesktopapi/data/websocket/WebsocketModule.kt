@@ -3,6 +3,7 @@ package de.romqu.trdesktopapi.data.websocket
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import de.romqu.trdesktopapi.data.shared.di.WEB_SOCKET_CLIENT
+import de.romqu.trdesktopapi.data.websocket.portfolio.PortfolioAggregateHistoryLightInDto
 import kotlinx.coroutines.flow.MutableSharedFlow
 import okhttp3.OkHttpClient
 import okhttp3.WebSocket
@@ -23,7 +24,11 @@ class WebsocketModule {
     fun getMapperTypeCache(): Cache<String, WebsocketDtoType> = Caffeine.newBuilder().build()
 
     @Bean
-    fun getDtoBroadcastStream() = MutableSharedFlow<Any>()
+    fun portfolioLightHistoryBroadcastStream(): MutableSharedFlow<PortfolioAggregateHistoryLightInDto> =
+        MutableSharedFlow()
+
+    @Bean
+    fun authErrorInDtoBroadcastStream(): MutableSharedFlow<AuthErrorInDto> = MutableSharedFlow()
 
     @Bean
     fun cache(): Cache<Long, WebSocket> =

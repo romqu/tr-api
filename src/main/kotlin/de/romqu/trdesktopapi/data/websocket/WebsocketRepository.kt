@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.benmanes.caffeine.cache.Cache
 import de.romqu.trdesktopapi.data.auth.session.SessionRepository
 import de.romqu.trdesktopapi.data.shared.signrequest.HEADER_SESSION_ID
+import de.romqu.trdesktopapi.data.websocket.connect.ConnectOutDto
+import de.romqu.trdesktopapi.data.websocket.portfolio.PortfolioAggregateHistoryLightInDto
 import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.runBlocking
@@ -20,8 +22,8 @@ class WebsocketRepository(
     private val cache: Cache<Long, WebSocket>,
     private val objectMapper: ObjectMapper,
     private val mapperTypeCache: Cache<String, WebsocketDtoType>,
-    private val dtoBroadcastStream: MutableSharedFlow<Any>,
     private val sessionRepository: SessionRepository,
+    private val portfolioAggregateHistoryLightStream: MutableSharedFlow<PortfolioAggregateHistoryLightInDto>,
 ) {
     private val websocketBroadcastListener = WebsocketBroadcastListener()
 
@@ -73,6 +75,9 @@ class WebsocketRepository(
                 when (dtoType) {
                     WebsocketDtoType.CONNECT -> {
                     }
+                    WebsocketDtoType.PORTFOLIO_HISTORY_LIGHT -> portfolioAggregateHistoryLightStream.tryEmit(
+                        objectMapper.readValue(dtoValue, PortfolioAggregateHistoryLightInDto::class.java)
+                    )
                 }
             } else if (text.contains("AUTHENTICATION_ERROR") && text.contains("Unauthorized")) {
 
@@ -102,5 +107,5 @@ class WebsocketRepository(
 }
 
 enum class WebsocketDtoType {
-    CONNECT
+    CONNECT, PORTFOLIO_HISTORY_LIGHT
 }
