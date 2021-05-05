@@ -21,7 +21,7 @@ import javax.net.ssl.X509TrustManager
 class WebsocketModule {
 
     @Bean
-    fun getMapperTypeCache(): Cache<String, WebsocketDtoType> = Caffeine.newBuilder().build()
+    fun getDtoTypeCache(): Cache<String, WebsocketDtoType> = Caffeine.newBuilder().build()
 
     @Bean
     fun portfolioLightHistoryBroadcastStream(): MutableSharedFlow<PortfolioAggregateHistoryLightInDto> =
@@ -31,7 +31,10 @@ class WebsocketModule {
     fun authErrorInDtoBroadcastStream(): MutableSharedFlow<AuthErrorInDto> = MutableSharedFlow()
 
     @Bean
-    fun cache(): Cache<Long, WebSocket> =
+    fun websocketMessageStream(): MutableSharedFlow<WebsocketRepository.WebsocketMessageInDto> = MutableSharedFlow()
+
+    @Bean
+    fun cache(): Cache<String, WebSocket> =
         Caffeine.newBuilder().maximumSize(100).build()
 
     @Bean(WEB_SOCKET_CLIENT)
