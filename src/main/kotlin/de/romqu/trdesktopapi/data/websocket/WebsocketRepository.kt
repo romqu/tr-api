@@ -15,13 +15,13 @@ import java.util.*
 
 const val URL_WEBSOCKET = "wss://api.traderepublic.com"
 
-
 @Repository
 class WebsocketRepository(
     @Qualifier("WEB_SOCKET_CLIENT") private val client: OkHttpClient,
     private val cache: Cache<String, WebSocket>,
-    private val objectMapper: ObjectMapper,
     private val dtoTypeCache: Cache<String, WebsocketDtoType>,
+    private val lastSubscriptionNumberCache: Cache<String, Int>,
+    private val objectMapper: ObjectMapper,
     private val authErrorStream: MutableSharedFlow<AuthErrorInDto>,
     private val websocketMessageStream: MutableSharedFlow<WebsocketMessageInDto>,
 ) {
@@ -33,34 +33,41 @@ class WebsocketRepository(
         val dtoType: WebsocketDtoType,
     )
 
-    fun create(sessionId: String): WebSocket {
+    fun hasConnection(sessionId: UUID) = cache.getIfPresent(sessionId.toString()) != null
+
+    fun create(sessionId: UUID): WebSocket {
         val request = Request.Builder()
-            .addHeader(HEADER_SESSION_ID, sessionId)
+            .addHeader(HEADER_SESSION_ID, sessionId.toString())
             .url(URL_WEBSOCKET)
             .build()
 
         return client.newWebSocket(request, websocketBroadcastListener)
     }
 
-    fun save(id: String, webSocket: WebSocket) {
-        cache.put(id, webSocket)
+    fun save(id: UUID, webSocket: WebSocket) {
+        cache.put(id.toString(), webSocket)
     }
 
-    fun delete(id: String) {
-        cache.invalidate(id)
+    fun delete(id: UUID) {
+        cache.invalidate(id.toString())
     }
 
-    fun subscribe(sessionId: String, subscriptionNumber: Int, outDto: WebsocketOutDto) {
-        dtoTypeCache.put("$sessionId$subscriptionNumber", outDto.dtoType)
+    fun subscribe(sessionId: String, outDto: WebsocketOutDto) {
+        val subscriptionNumber = lastSubscriptionNumberCache.get(sessionId) { 0 }.plus(1)
         val subscriptionRequest = objectMapper.writeValueAsString(outDto)
+
+        dtoTypeCache.put("$sessionId$subscriptionNumber", outDto.dtoType)
         cache.getIfPresent(sessionId)?.send(subscriptionRequest)
+
+        lastSubscriptionNumberCache.put(sessionId, subscriptionNumber)
     }
 
-    fun connect(sessionId: String, dto: ConnectOutDto) {
+    fun connect(sessionId: UUID, dto: ConnectOutDto, webSocket: WebSocket) {
         dtoTypeCache.put("${sessionId}0", dto.dtoType)
         val connectRequest = "connect 22 ${objectMapper.writeValueAsString(dto)}"
-        cache.getIfPresent(sessionId)?.send(connectRequest)
+        webSocket.send(connectRequest)
     }
+
 
     inner class WebsocketBroadcastListener : WebSocketListener() {
 
