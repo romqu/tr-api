@@ -52,7 +52,7 @@ class WebsocketRepository(
         cache.invalidate(id.toString())
     }
 
-    fun subscribe(sessionId: String, outDto: WebsocketOutDto) {
+    fun subscribe(sessionId: String, outDto: WebSocketOutDto) {
         val subscriptionNumber = lastSubscriptionNumberCache.get(sessionId) { 0 }.plus(1)
         val subscriptionRequest = objectMapper.writeValueAsString(outDto)
 

@@ -1,5 +1,5 @@
 package de.romqu.trdesktopapi.data.websocket
 
-interface WebsocketOutDto {
+interface WebSocketOutDto {
     val dtoType: WebsocketDtoType
 }

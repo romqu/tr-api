@@ -4,7 +4,7 @@ import de.romqu.trdesktopapi.data.websocket.WebsocketRepository
 import de.romqu.trdesktopapi.data.websocket.connect.ConnectOutDto
 import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity
 
-class ConnectToWebsocketService(
+class ConnectToWebSocketService(
     private val websocketRepository: WebsocketRepository,
 ) {
 
@@ -23,5 +23,4 @@ class ConnectToWebsocketService(
             websocketRepository.connect(session.uuidId, connectOutDto, websocket)
         }
     }
-
 }

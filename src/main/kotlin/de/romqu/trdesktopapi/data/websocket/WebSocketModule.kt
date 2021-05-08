@@ -18,7 +18,7 @@ import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
 @Component
-class WebsocketModule {
+class WebSocketModule {
 
     @Bean
     fun cache(): Cache<String, WebSocket> =

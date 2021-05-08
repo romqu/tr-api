@@ -69,4 +69,8 @@ class SessionRepository(
     fun deleteAll() {
         db.delete(SESSION).execute()
     }
+
+    fun doesExist(uuid: UUID): Boolean {
+        return db.fetchExists(db.selectOne().from(SESSION).where(SESSION.UUID_ID.eq(uuid)))
+    }
 }
