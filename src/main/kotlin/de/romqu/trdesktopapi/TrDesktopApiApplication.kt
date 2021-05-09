@@ -4,9 +4,10 @@ package de.romqu.trdesktopapi
 import com.fasterxml.jackson.databind.ObjectMapper
 import de.romqu.trdesktopapi.data.auth.session.SessionRepository
 import de.romqu.trdesktopapi.data.shared.di.WEB_SOCKET_CLIENT
-import de.romqu.trdesktopapi.domain.AuthenticateAccountService
+import de.romqu.trdesktopapi.domain.AuthenticateAccountTask
 import de.romqu.trdesktopapi.domain.LoginService
 import de.romqu.trdesktopapi.domain.ResetDeviceService
+import de.romqu.trdesktopapi.shared.map
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
@@ -19,7 +20,7 @@ import java.util.*
 
 @SpringBootApplication
 class TrDesktopApiApplication(
-    private val authenticateAccountService: AuthenticateAccountService,
+    private val authenticateAccountTask: AuthenticateAccountTask,
     private val sessionRepository: SessionRepository,
     private val loginService: LoginService,
     private val resetDeviceService: ResetDeviceService,
@@ -29,13 +30,28 @@ class TrDesktopApiApplication(
 
 
     init {
-        /*sessionRepository.deleteAll()
-        login()*/
+        sessionRepository.deleteAll()
+        login()
     }
 
     private fun login() {
+
         GlobalScope.launch {
-            val result = authenticateAccountService.execute(15783936784)
+            val result = loginService.execute(15783936784, 4289, null)
+            result.map { session ->
+
+                println("Enter Code: ")
+                val scanner = Scanner(System.`in`)
+                val code = scanner.next()
+
+                resetDeviceService.execute(code, session)
+                loginService.execute(15783936784, 4289, session)
+            }
+        }
+
+/*
+        GlobalScope.launch {
+            val result = authenticateAccountTask.execute(15783936784)
                 .doOn({
                     val session = sessionRepository.getByUuid(it)
                     loginService.execute(15783936784, 4289, session!!)
@@ -50,6 +66,7 @@ class TrDesktopApiApplication(
 
                 }, {})
         }
+*/
     }
 
 /*        webSocket.send("""connect 22 {"clientId":"de.traderepublic.app","clientVersion":"1.1.5486","device":"$device","locale":"en","platformId":"android","platformVersion":"30"}""")

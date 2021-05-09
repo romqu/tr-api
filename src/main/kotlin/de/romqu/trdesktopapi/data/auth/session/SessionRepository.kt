@@ -62,8 +62,9 @@ class SessionRepository(
         }
     }
 
-    fun update(entity: SessionEntity) {
+    fun update(entity: SessionEntity): SessionEntity {
         dao.update(entity)
+        return entity
     }
 
     fun deleteAll() {

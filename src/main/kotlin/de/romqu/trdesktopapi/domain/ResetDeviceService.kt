@@ -17,7 +17,10 @@ class ResetDeviceService(
     private val resetDeviceRepository: ResetDeviceRepository,
 ) {
 
-    suspend fun execute(code: String, session: SessionEntity): Result<ApiCallError, Unit> =
+    suspend fun execute(
+        code: String,
+        session: SessionEntity,
+    ): Result<ApiCallError, SessionEntity> =
         getDeviceKey(session)
             .resetDevice(code, session)
             .resetProcessIdFromSession(session)
@@ -36,7 +39,7 @@ class ResetDeviceService(
 
     private fun Result<ApiCallError, Unit>.resetProcessIdFromSession(
         session: SessionEntity,
-    ): Result<ApiCallError, Unit> {
+    ): Result<ApiCallError, SessionEntity> {
 
         val updatedSession = with(session) {
             SessionEntity(

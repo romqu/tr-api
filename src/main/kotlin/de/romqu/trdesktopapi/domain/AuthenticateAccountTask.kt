@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class AuthenticateAccountService(
+class AuthenticateAccountTask(
     private val createKeypairTask: CreateKeypairTask,
     private val keypairRepository: KeypairRepository,
     private val sessionRepository: SessionRepository,
