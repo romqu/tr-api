@@ -15,7 +15,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 class WebConfig : WebMvcConfigurer {
 
     @Autowired
-    lateinit var headerWeboscketSessionMethodArgumentResolver: HeaderWeboscketSessionMethodArgumentResolver
+    lateinit var headerWebSocketSessionMethodArgumentResolver: HeaderWebSocketSessionMethodArgumentResolver
 
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
         super.addArgumentResolvers(resolvers)

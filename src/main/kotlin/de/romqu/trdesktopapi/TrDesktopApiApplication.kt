@@ -30,8 +30,8 @@ class TrDesktopApiApplication(
 
 
     init {
-        sessionRepository.deleteAll()
-        login()
+        // sessionRepository.deleteAll()
+        // login()
     }
 
     private fun login() {

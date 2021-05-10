@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class HeaderWeboscketSessionMethodArgumentResolver(
+class HeaderWebSocketSessionMethodArgumentResolver(
     private val sessionRepository: SessionRepository,
 ) : HandlerMethodArgumentResolver {
 
@@ -21,13 +21,8 @@ class HeaderWeboscketSessionMethodArgumentResolver(
 
     override fun resolveArgument(parameter: MethodParameter, message: Message<*>): SessionEntity {
 
-        val sessionTokenUuid = StompHeaderAccessor.wrap(message).getNativeHeader(HttpHeaders.AUTHORIZATION)
+        val authHeader = StompHeaderAccessor.wrap(message).getFirstNativeHeader(HttpHeaders.AUTHORIZATION)
             ?: throw Exception()
-
-        sessionRepository.getByUuid(UUID.fromString(sessionTokenUuid)) ?: throw Exception()
-
-        val authHeader = webRequest.getHeader(HttpHeaders.AUTHORIZATION)
-            ?: throw  Exception()
 
         val authMatcher = AUTH_BEARER_PATTERN.matcher(authHeader)
 

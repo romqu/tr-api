@@ -20,10 +20,10 @@ class WebSocketConfig : WebSocketMessageBrokerConfigurer {
     lateinit var webSocketAuthHandshakeInterceptor: WebSocketAuthHandshakeInterceptor
 
     @Autowired
-    lateinit var headerWeboscketSessionMethodArgumentResolver: HeaderWeboscketSessionMethodArgumentResolver
+    lateinit var headerWebSocketSessionMethodArgumentResolver: HeaderWebSocketSessionMethodArgumentResolver
 
     override fun addArgumentResolvers(argumentResolvers: MutableList<HandlerMethodArgumentResolver>) {
-        argumentResolvers.add(headerWeboscketSessionMethodArgumentResolver)
+        argumentResolvers.add(headerWebSocketSessionMethodArgumentResolver)
         super.addArgumentResolvers(argumentResolvers)
     }
 

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.web.server.LocalServerPort
+import org.springframework.http.HttpHeaders
 import org.springframework.messaging.converter.StringMessageConverter
 import org.springframework.messaging.simp.stomp.StompHeaders
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter
@@ -32,10 +33,10 @@ internal class TestWebSocketControllerTest {
 
 
         val stompHeaders = StompHeaders()
-        stompHeaders.add("sessionToken", "a4e0c94a-35b7-4c5e-aea1-7ec73c08405e")
+        stompHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer a4e0c94a-35b7-4c5e-aea1-7ec73c08405e")
         stompHeaders.session = "session21432143243243243"
         val handshakeHeaders = WebSocketHttpHeaders()
-        handshakeHeaders.add("sessionToken", "a4e0c94a-35b7-4c5e-aea1-7ec73c08405e")
+        handshakeHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer a4e0c94a-35b7-4c5e-aea1-7ec73c08405e")
 
 
         val sessionF = webSocketStompClient.connect(
