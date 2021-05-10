@@ -24,6 +24,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("org.flywaydb:flyway-core")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -46,6 +47,7 @@ dependencies {
     implementation("org.bouncycastle:bcprov-jdk15on:1.68")
 
     implementation("com.github.ben-manes.caffeine:caffeine:3.0.2")
+
 }
 
 tasks.withType<KotlinCompile> {

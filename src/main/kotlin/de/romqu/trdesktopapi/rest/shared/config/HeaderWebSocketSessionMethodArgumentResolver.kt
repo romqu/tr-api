@@ -2,13 +2,13 @@ package de.romqu.trdesktopapi.rest.shared.config
 
 import de.romqu.trdesktopapi.data.auth.session.SessionRepository
 import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity
+import de.romqu.trdesktopapi.rest.shared.SessionUtil
 import org.springframework.core.MethodParameter
 import org.springframework.http.HttpHeaders
 import org.springframework.messaging.Message
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class HeaderWebSocketSessionMethodArgumentResolver(
@@ -24,16 +24,6 @@ class HeaderWebSocketSessionMethodArgumentResolver(
         val authHeader = StompHeaderAccessor.wrap(message).getFirstNativeHeader(HttpHeaders.AUTHORIZATION)
             ?: throw Exception()
 
-        val authMatcher = AUTH_BEARER_PATTERN.matcher(authHeader)
-
-        val token = authMatcher.group(1)
-
-        val sessionUuid = try {
-            UUID.fromString(token)
-        } catch (ex: Exception) {
-            throw Exception()
-        }
-
-        return sessionRepository.getByUuid(sessionUuid) ?: throw Exception()
+        return SessionUtil.getSessionFromAuthHeader(authHeader, sessionRepository)
     }
 }

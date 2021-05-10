@@ -1,6 +1,6 @@
 package de.romqu.trdesktopapi.data.auth.login
 
-class LoginOutDto(
+class LoginOutTrDto(
     val phoneNumber: String,
     val pin: Int,
 )

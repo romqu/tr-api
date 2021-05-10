@@ -4,13 +4,14 @@ import de.romqu.trdesktopapi.data.KeypairRepository
 import de.romqu.trdesktopapi.data.auth.account.resetdevice.ResetDeviceRepository
 import de.romqu.trdesktopapi.data.auth.account.resetdevice.request.RequestResetDeviceInDto
 import de.romqu.trdesktopapi.data.auth.account.resetdevice.request.RequestResetDeviceOutDto
-import de.romqu.trdesktopapi.data.auth.login.LoginInDto
-import de.romqu.trdesktopapi.data.auth.login.LoginOutDto
+import de.romqu.trdesktopapi.data.auth.login.LoginInTrDto
+import de.romqu.trdesktopapi.data.auth.login.LoginOutTrDto
 import de.romqu.trdesktopapi.data.auth.login.LoginRepository
 import de.romqu.trdesktopapi.data.auth.session.SessionRepository
 import de.romqu.trdesktopapi.data.shared.ApiCallError
 import de.romqu.trdesktopapi.public_.tables.pojos.KeypairEntity
 import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity
+import de.romqu.trdesktopapi.rest.login.LoginInDto
 import de.romqu.trdesktopapi.shared.Result
 import de.romqu.trdesktopapi.shared.map
 import org.springframework.stereotype.Service
@@ -26,17 +27,16 @@ class LoginService(
 ) {
 
     suspend fun execute(
-        phoneNumber: Long,
-        pinNumber: Int,
+        dto: LoginInDto,
         session: SessionEntity?,
     ): Result<ApiCallError, SessionEntity> =
         maybeCreateSession(session).run {
-            login(phoneNumber, pinNumber, this).doOn(
+            login(dto.phoneNumber, dto.pinNumber, this).doOn(
                 success = { loginInDto ->
                     updateSessionWithTokens(loginInDto, this)
                 },
                 failure = {
-                    requestDeviceReset(phoneNumber, pinNumber, this)
+                    requestDeviceReset(dto.phoneNumber, dto.pinNumber, this)
                         .updateSessionWithResetProcessId(this)
                 }
             )
@@ -66,14 +66,14 @@ class LoginService(
         phoneNumber: Long,
         pinNumber: Int,
         session: SessionEntity,
-    ): Result<ApiCallError, LoginInDto> = loginRepository.login(
-        LoginOutDto(
+    ): Result<ApiCallError, LoginInTrDto> = loginRepository.login(
+        LoginOutTrDto(
             "+49$phoneNumber", pinNumber
         ), session.uuidId
     )
 
     private fun updateSessionWithTokens(
-        dto: LoginInDto,
+        trDto: LoginInTrDto,
         session: SessionEntity,
     ): Result<ApiCallError, SessionEntity> {
         val updatedSession = with(session) {
@@ -81,9 +81,9 @@ class LoginService(
                 id,
                 uuidId,
                 deviceId,
-                dto.sessionToken.token,
-                dto.refreshToken.token,
-                dto.trackingId.toString(),
+                trDto.sessionToken.token,
+                trDto.refreshToken.token,
+                trDto.trackingId.toString(),
                 null,
                 keypairId,
             )

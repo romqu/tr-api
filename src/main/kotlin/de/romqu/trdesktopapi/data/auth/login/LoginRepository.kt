@@ -13,7 +13,7 @@ class LoginRepository(
     private val apiCallDelegate: ApiCallDelegate,
 ): ApiCall by apiCallDelegate {
 
-    suspend fun login(dto: LoginOutDto, sessionId: UUID): Result<ApiCallError, LoginInDto> =
-        makeApiCallWith { api.login(dto, sessionId.toString()) }
+    suspend fun login(trDto: LoginOutTrDto, sessionId: UUID): Result<ApiCallError, LoginInTrDto> =
+        makeApiCallWith { api.login(trDto, sessionId.toString()) }
 
 }

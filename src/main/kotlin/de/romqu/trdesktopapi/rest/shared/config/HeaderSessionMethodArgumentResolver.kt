@@ -2,6 +2,7 @@ package de.romqu.trdesktopapi.rest.shared.config
 
 import de.romqu.trdesktopapi.data.auth.session.SessionRepository
 import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity
+import de.romqu.trdesktopapi.rest.shared.SessionUtil
 import org.springframework.core.MethodParameter
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
@@ -9,7 +10,6 @@ import org.springframework.web.bind.support.WebDataBinderFactory
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
-import java.util.*
 
 @Component
 class HeaderSessionMethodArgumentResolver(
@@ -28,18 +28,8 @@ class HeaderSessionMethodArgumentResolver(
     ): SessionEntity {
 
         val authHeader = webRequest.getHeader(HttpHeaders.AUTHORIZATION)
-            ?: throw  Exception()
+            ?: throw  Exception() // Header does not exist
 
-        val authMatcher = AUTH_BEARER_PATTERN.matcher(authHeader)
-
-        val token = authMatcher.group(1)
-
-        val sessionUuid = try {
-            UUID.fromString(token)
-        } catch (ex: Exception) {
-            throw Exception()
-        }
-
-        return sessionRepository.getByUuid(sessionUuid) ?: throw Exception()
+        return SessionUtil.getSessionFromAuthHeader(authHeader, sessionRepository)
     }
 }
