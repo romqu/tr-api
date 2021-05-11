@@ -7,16 +7,12 @@ import de.romqu.trdesktopapi.data.shared.di.WEB_SOCKET_CLIENT
 import de.romqu.trdesktopapi.domain.AuthenticateAccountTask
 import de.romqu.trdesktopapi.domain.LoginService
 import de.romqu.trdesktopapi.domain.ResetDeviceService
-import de.romqu.trdesktopapi.shared.map
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import java.security.Security
-import java.util.*
 
 @SpringBootApplication
 class TrDesktopApiApplication(
@@ -36,7 +32,7 @@ class TrDesktopApiApplication(
 
     private fun login() {
 
-        GlobalScope.launch {
+/*        GlobalScope.launch {
             val result = loginService.execute(15783936784, 4289, null)
             result.map { session ->
 
@@ -47,7 +43,7 @@ class TrDesktopApiApplication(
                 resetDeviceService.execute(code, session)
                 loginService.execute(15783936784, 4289, session)
             }
-        }
+        }*/
 
 /*
         GlobalScope.launch {
