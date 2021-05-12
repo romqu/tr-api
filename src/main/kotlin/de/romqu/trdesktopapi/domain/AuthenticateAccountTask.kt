@@ -1,28 +1,18 @@
 package de.romqu.trdesktopapi.domain
 
-import de.romqu.trdesktopapi.data.KeypairRepository
-import de.romqu.trdesktopapi.data.auth.account.AccountRepository
-import de.romqu.trdesktopapi.data.auth.account.AuthenticateAccountOutDto
-import de.romqu.trdesktopapi.data.auth.session.SessionRepository
-import de.romqu.trdesktopapi.data.shared.ApiCallError
-import de.romqu.trdesktopapi.data.shared.extension.asX962
-import de.romqu.trdesktopapi.public_.tables.pojos.KeypairEntity
-import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity
-import de.romqu.trdesktopapi.shared.Result
-import de.romqu.trdesktopapi.shared.map
-import org.springframework.stereotype.Service
-import java.util.*
-
+/**
+ * Currently not needed
+ *
 @Service
 class AuthenticateAccountTask(
-    private val createKeypairTask: CreateKeypairTask,
-    private val keypairRepository: KeypairRepository,
-    private val sessionRepository: SessionRepository,
-    private val accountRepository: AccountRepository,
+private val createKeypairTask: CreateKeypairTask,
+private val keypairRepository: KeypairRepository,
+private val sessionRepository: SessionRepository,
+private val accountRepository: AccountRepository,
 ) {
 
-    suspend fun execute(
-        phoneNumber: Long,
+suspend fun execute(
+phoneNumber: Long,
     ): Result<ApiCallError, UUID> = createSession()
         .authenticateAccount(phoneNumber)
 
@@ -48,14 +38,14 @@ class AuthenticateAccountTask(
 
     private suspend fun FirstOut.authenticateAccount(
         phoneNumber: Long,
-    ): Result<ApiCallError, UUID> {
+): Result<ApiCallError, UUID> {
 
-        val deviceKey = keypairEntity.publicKey.asX962()
+val deviceKey = keypairEntity.publicKey.asX962()
 
-        val dto = AuthenticateAccountOutDto(deviceKey, jurisdiction = "DE", phoneNumber = "+49$phoneNumber")
+val dto = AuthenticateAccountOutDto(deviceKey, jurisdiction = "DE", phoneNumber = "+49$phoneNumber")
 
-        return accountRepository.authenticate(dto, sessionEntity.uuidId)
-            .map { sessionEntity.uuidId }
-    }
-
+return accountRepository.authenticate(dto, sessionEntity.uuidId)
+.map { sessionEntity.uuidId }
 }
+
+}*/

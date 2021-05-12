@@ -30,7 +30,7 @@ sealed class Result<out F, out S> {
         inline fun <S1, S2, F, R> zip(
             result1: Result<F, S1>,
             result2: Result<F, S2>,
-            transform: (S1, S2) -> R
+            transform: (S1, S2) -> R,
         ): Result<F, R> =
             result1.flatMap { s1 ->
                 result2.map { s2 ->
@@ -53,7 +53,7 @@ fun <F, S> Result<F, S>.isFailure(): Boolean {
 inline fun <F, S, R> Result<F, S>.doOn(
     success: (S) -> Result<F, R>,
     withFailureCondition: (F) -> Boolean,
-    failure: (F) -> Result<F, R>
+    failure: (F) -> Result<F, R>,
 ): Result<F, R> =
     when (this) {
         is Result.Failure -> if (withFailureCondition(this.failure)) failure(this.failure) else this
@@ -62,7 +62,7 @@ inline fun <F, S, R> Result<F, S>.doOn(
 
 inline fun <F, S, reified E : Any> Result<F, S>.doOnFailureElseContinue(
     failureType: E,
-    `do`: (E) -> Result<F, S>
+    `do`: (E) -> Result<F, S>,
 ): Result<F, S> =
     when (this) {
         is Result.Failure -> if (failure is E) `do`(this.failure) else this
@@ -71,7 +71,7 @@ inline fun <F, S, reified E : Any> Result<F, S>.doOnFailureElseContinue(
 
 inline fun <F, S, reified F2 : F> Result<F, S>.doIfFailureElseContinue(
     isOfType: (F) -> Boolean = { it is F2 },
-    `do`: (F2) -> Result<F, S>
+    `do`: (F2) -> Result<F, S>,
 ): Result<F, S> =
     when (this) {
         is Result.Failure -> if (isOfType(this.failure)) `do`(this.failure as F2) else this
@@ -81,7 +81,7 @@ inline fun <F, S, reified F2 : F> Result<F, S>.doIfFailureElseContinue(
 inline fun <F, S, R, reified FT : Any> Result<F, S>.doOn(
     success: (S) -> Result<F, R>,
     withFailureType: FT,
-    failure: (F) -> Result<F, R>
+    failure: (F) -> Result<F, R>,
 ): Result<F, R> =
     when (this) {
         is Result.Failure -> if (this.failure is FT) failure(this.failure) else this
@@ -118,7 +118,7 @@ fun <F, S, R> List<Result<F, S>>.mapResult(transform: (S) -> R) {
 }
 
 inline fun <F, S, R> Result<F, S>.flatMap(
-    transform: (S) -> Result<F, R>
+    transform: (S) -> Result<F, R>,
 ): Result<F, R> =
     doOn(transform) { this as Result.Failure }
 
@@ -127,18 +127,18 @@ inline fun <F, S, R> Result<F, S>.map(transform: (S) -> R): Result<F, R> =
 
 inline fun <S1, S2, F, R> Result<F, S1>.zipWith(
     result2: Result<F, S2>,
-    transform: (S1, S2) -> R
+    transform: (S1, S2) -> R,
 ): Result<F, R> = Result.zip(this, result2, transform)
 
 inline fun <F, S, R, F2> Result<F, S>.flatMapError(
     transform: (S) -> Result<F2, R>,
-    transformError: (F) -> F2
+    transformError: (F) -> F2,
 ): Result<F2, R> =
     doOn(transform) { Result.Failure(transformError((this as Result.Failure).failure)) }
 
 inline fun <F, S, R, F2> Result<F, S>.mapError(
     transform: (S) -> R = { it as R },
-    transformError: (F) -> F2
+    transformError: (F) -> F2,
 ): Result<F2, R> =
     flatMapError({ Result.Success(transform(it)) }, transformError)
 
@@ -146,7 +146,7 @@ inline fun <F, S, R, F2> Result<F, S>.mapError(
 inline fun <F, S, R> Result<F, S>.asyncFlatMap(
     scope: CoroutineScope,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
-    crossinline block: (S) -> R
+    crossinline block: (S) -> R,
 ): Result<F, S> {
 
     scope.launch(dispatcher) {
@@ -159,7 +159,7 @@ inline fun <F, S, R> Result<F, S>.asyncFlatMap(
 inline fun <F, S, R> Result<F, S>.doAsync(
     scope: CoroutineScope,
     dispatcher: CoroutineDispatcher = Dispatchers.Default,
-    crossinline block: (S) -> R
+    crossinline block: (S) -> R,
 ): Result<F, S> {
 
     scope.launch(dispatcher) {

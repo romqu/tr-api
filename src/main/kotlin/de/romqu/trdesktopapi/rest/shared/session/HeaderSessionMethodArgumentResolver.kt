@@ -1,8 +1,8 @@
-package de.romqu.trdesktopapi.rest.shared.config
+package de.romqu.trdesktopapi.rest.shared.session
 
-import de.romqu.trdesktopapi.data.auth.session.SessionRepository
+import de.romqu.trdesktopapi.domain.GetSessionByAuthHeaderTask
 import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity
-import de.romqu.trdesktopapi.rest.shared.SessionUtil
+import de.romqu.trdesktopapi.rest.shared.errorhandling.InvalidSessionExceptionHandler.InvalidSessionException
 import org.springframework.core.MethodParameter
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
@@ -13,23 +13,19 @@ import org.springframework.web.method.support.ModelAndViewContainer
 
 @Component
 class HeaderSessionMethodArgumentResolver(
-    private val sessionRepository: SessionRepository,
+    private val getSessionByAuthHeaderTask: GetSessionByAuthHeaderTask,
 ) : HandlerMethodArgumentResolver {
 
-    override fun supportsParameter(parameter: MethodParameter): Boolean {
-        return parameter.parameterType == SessionEntity::class.java
-    }
+    override fun supportsParameter(parameter: MethodParameter): Boolean =
+        parameter.parameterType == SessionEntity::class.java
 
     override fun resolveArgument(
         parameter: MethodParameter,
         mavContainer: ModelAndViewContainer?,
         webRequest: NativeWebRequest,
         binderFactory: WebDataBinderFactory?,
-    ): SessionEntity {
-
-        val authHeader = webRequest.getHeader(HttpHeaders.AUTHORIZATION)
-            ?: throw  Exception() // Header does not exist
-
-        return SessionUtil.getSessionFromAuthHeader(authHeader, sessionRepository)
-    }
+    ): SessionEntity =
+        getSessionByAuthHeaderTask.execute(
+            webRequest.getHeader(HttpHeaders.AUTHORIZATION)
+        ).doOn(success = { it }, failure = { throw InvalidSessionException })
 }

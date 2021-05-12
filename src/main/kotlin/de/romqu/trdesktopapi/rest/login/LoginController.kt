@@ -15,8 +15,11 @@ import javax.validation.Valid
 class LoginController(
     private val loginService: LoginService,
 ) {
+    companion object {
+        const val URL_PATH = "/v1/auth/login"
+    }
 
-    @PostMapping("/v1/auth/login")
+    @PostMapping(URL_PATH)
     fun login(
         @Header(HttpHeaders.AUTHORIZATION, required = false) authHeader: String?,
         @RequestBody @Valid dto: LoginInDto,

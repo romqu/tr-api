@@ -1,4 +1,4 @@
-package de.romqu.trdesktopapi.rest.shared.config
+package de.romqu.trdesktopapi.rest.shared.session
 
 import de.romqu.trdesktopapi.data.auth.session.SessionRepository
 import org.springframework.http.HttpHeaders
@@ -19,7 +19,6 @@ val AUTH_BEARER_PATTERN: Pattern =
 class WebSocketAuthHandshakeInterceptor(
     private val sessionRepository: SessionRepository,
 ) : HandshakeInterceptor {
-
 
     override fun beforeHandshake(
         request: ServerHttpRequest,
@@ -53,5 +52,4 @@ class WebSocketAuthHandshakeInterceptor(
         exception: Exception?,
     ) {
     }
-
 }

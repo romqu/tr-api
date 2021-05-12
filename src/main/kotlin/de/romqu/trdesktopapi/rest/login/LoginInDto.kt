@@ -1,18 +1,14 @@
 package de.romqu.trdesktopapi.rest.login
 
-import javax.validation.constraints.Max
-import javax.validation.constraints.Min
+import javax.validation.constraints.Size
 
 class LoginInDto(
-    @field:Min(2)
-    @field:Max(3)
-    val countryCode: Long,
+    @Size(min = 2, max = 3)
+    val countryCode: String,
 
-    @field:Min(5)
-    @field:Max(15)
-    val phoneNumber: Long,
+    @Size(min = 5, max = 15)
+    val phoneNumber: String,
 
-    @field:Min(4)
-    @field:Max(4)
-    val pinNumber: Int,
+    @Size(min = 4, max = 4)
+    val pinNumber: String,
 )

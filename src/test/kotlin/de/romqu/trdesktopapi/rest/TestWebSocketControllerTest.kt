@@ -11,6 +11,7 @@ import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter
 import org.springframework.web.socket.WebSocketHttpHeaders
 import org.springframework.web.socket.client.standard.StandardWebSocketClient
 import org.springframework.web.socket.messaging.WebSocketStompClient
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
 
@@ -31,9 +32,8 @@ internal class TestWebSocketControllerTest {
     @Test
     fun connect() {
 
-
         val stompHeaders = StompHeaders()
-        stompHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer a4e0c94a-35b7-4c5e-aea1-7ec73c08405e")
+        stompHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer a4e0c94a-35b7-4c5e-aea1-7ec73c08405")
         stompHeaders.session = "session21432143243243243"
         val handshakeHeaders = WebSocketHttpHeaders()
         handshakeHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer a4e0c94a-35b7-4c5e-aea1-7ec73c08405e")
@@ -48,9 +48,14 @@ internal class TestWebSocketControllerTest {
             )
 
 
-        val session = sessionF.get(100, TimeUnit.SECONDS)
+        val session = try {
+            sessionF.get(100, TimeUnit.SECONDS)
+        } catch (ex: ExecutionException) {
+            ex.message
+            null
+        }
 
-        session.send(stompHeaders.apply { destination = "/app/hello" }, "tom")
+        session?.send(stompHeaders.apply { destination = "/app/hello" }, "tom")
 
         Thread.sleep(10000)
     }

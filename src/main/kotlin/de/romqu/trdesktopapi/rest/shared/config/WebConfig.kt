@@ -1,5 +1,6 @@
 package de.romqu.trdesktopapi.rest.shared.config
 
+import de.romqu.trdesktopapi.rest.shared.session.HeaderSessionMethodArgumentResolver
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.Ordered
