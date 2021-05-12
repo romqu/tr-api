@@ -4,19 +4,22 @@ package de.romqu.trdesktopapi
 import com.fasterxml.jackson.databind.ObjectMapper
 import de.romqu.trdesktopapi.data.auth.session.SessionRepository
 import de.romqu.trdesktopapi.data.shared.di.WEB_SOCKET_CLIENT
-import de.romqu.trdesktopapi.domain.AuthenticateAccountTask
 import de.romqu.trdesktopapi.domain.LoginService
 import de.romqu.trdesktopapi.domain.ResetDeviceService
+import de.romqu.trdesktopapi.rest.login.LoginInDto
+import de.romqu.trdesktopapi.shared.map
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import java.security.Security
+import java.util.*
 
 @SpringBootApplication
 class TrDesktopApiApplication(
-    private val authenticateAccountTask: AuthenticateAccountTask,
     private val sessionRepository: SessionRepository,
     private val loginService: LoginService,
     private val resetDeviceService: ResetDeviceService,
@@ -32,18 +35,18 @@ class TrDesktopApiApplication(
 
     private fun login() {
 
-/*        GlobalScope.launch {
-            val result = loginService.execute(15783936784, 4289, null)
+        GlobalScope.launch {
+            val result = loginService.execute(LoginInDto(countryCode = "49", phoneNumber = "15783936784", "4289"), null)
             result.map { session ->
 
                 println("Enter Code: ")
                 val scanner = Scanner(System.`in`)
                 val code = scanner.next()
 
-                resetDeviceService.execute(code, session)
-                loginService.execute(15783936784, 4289, session)
+                // resetDeviceService.execute(code, session)
+                // loginService.execute(LoginInDto(countryCode = "49", phoneNumber = "15783936784", "4289"))
             }
-        }*/
+        }
 
 /*
         GlobalScope.launch {

@@ -1,7 +1,7 @@
 package de.romqu.trdesktopapi.data
 
 
-import de.romqu.trdesktopapi.data.shared.insertReturningId
+import de.romqu.trdesktopapi.data.shared.extension.insertReturningId
 import de.romqu.trdesktopapi.public_.tables.KeypairEntity.KEYPAIR
 import de.romqu.trdesktopapi.public_.tables.daos.KeypairDaoEntity
 import de.romqu.trdesktopapi.public_.tables.pojos.KeypairEntity

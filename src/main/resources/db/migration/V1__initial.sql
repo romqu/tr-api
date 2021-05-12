@@ -10,9 +10,9 @@ CREATE TABLE session
     id               BIGSERIAL PRIMARY KEY,
     uuid_id          UUID   NOT NULL UNIQUE,
     device_id        UUID   NOT NULL UNIQUE,
-    token            TEXT   NOT NULL UNIQUE,
-    refresh_token    TEXT   NOT NULL UNIQUE,
-    tracking_id      TEXT   NOT NULL UNIQUE,
+    token            TEXT   NOT NULL,
+    refresh_token    TEXT   NOT NULL,
+    tracking_id      TEXT   NOT NULL,
     reset_process_id UUID UNIQUE,
 
     keypair_id       BIGINT NOT NULL UNIQUE,

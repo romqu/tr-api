@@ -1,6 +1,6 @@
 package de.romqu.trdesktopapi.data.auth.session
 
-import de.romqu.trdesktopapi.data.shared.insertReturningId
+import de.romqu.trdesktopapi.data.shared.extension.insertReturningId
 import de.romqu.trdesktopapi.public_.tables.SessionEntity.SESSION
 import de.romqu.trdesktopapi.public_.tables.daos.SessionDaoEntity
 import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity

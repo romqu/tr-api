@@ -23,7 +23,7 @@ internal class LoginControllerTest {
     @Test
     fun login() {
 
-        val dto = LoginInDto(countryCode = "49", phoneNumber = "123456789", "1234")
+        val dto = LoginInDto(countryCode = "49", phoneNumber = "15783936784", "4289")
 
         val dtoAsString = objectMapper.writeValueAsString(dto)
 
@@ -33,8 +33,8 @@ internal class LoginControllerTest {
                 //.header(HttpHeaders.AUTHORIZATION, "Bearer a4e0c94a-35b7-4c5e-aea1-7ec73c08405e")
                 .content(dtoAsString)
             //.accept(MediaType.APPLICATION_JSON)
-        ).andReturn()
+        ).andReturn().getAsyncResult(100000)
 
-        result.response.contentAsString
+        result
     }
 }

@@ -1,4 +1,4 @@
-package de.romqu.trdesktopapi.data.shared
+package de.romqu.trdesktopapi.data.shared.extension
 
 import org.jooq.DSLContext
 import org.jooq.Field

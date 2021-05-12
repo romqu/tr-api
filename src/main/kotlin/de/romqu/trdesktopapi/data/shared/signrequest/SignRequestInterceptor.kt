@@ -24,46 +24,50 @@ class SignRequestInterceptor(
 
     override fun intercept(chain: Interceptor.Chain): Response {
 
-        val request = chain.request()
-        val keyFactory = KeyFactory.getInstance("EC")
-        val timestamp = System.currentTimeMillis().toString()
+        try {
+            val request = chain.request()
+            val keyFactory = KeyFactory.getInstance("EC")
+            val timestamp = System.currentTimeMillis().toString()
 
-        val session = sessionRepository.getByUuid(
-            request.header(HEADER_SESSION_ID)!!
-        )
-
-        val keypair = keypairRepository.getById(session!!.keypairId)!!
-
-        val deviceIdValue = session.deviceId.toString()
-
-
-        val newRequest = if (!request.url.toString().contains("/api/v1/auth/account/reset/device")) {
-            val privateKey = keyFactory.generatePrivate(
-                PKCS8EncodedKeySpec(keypair.privateKey)
-            )
-            val requestBodyValue = request.body.asString()
-
-            val signature = ApiRequestSignerUtil.sign(
-                "$timestamp.$requestBodyValue",
-                privateKey,
-                SIGN_ALGORITHM
+            val session = sessionRepository.getByUuid(
+                request.header(HEADER_SESSION_ID)!!
             )
 
-            chain.request().newBuilder().apply {
-                addHeader("X-Zeta-Device-Id", deviceIdValue)
-                addHeader("X-Zeta-Timestamp", timestamp)
-                addHeader("X-Zeta-Signature", signature!!)
-                addHeader("X-Zeta-Tracking-Id", session.trackingId)
-                removeHeader(HEADER_SESSION_ID)
-            }.build()
-        } else {
-            chain.request().newBuilder().apply {
-                addHeader("X-Zeta-Device-Id", deviceIdValue)
-                addHeader("X-Zeta-Tracking-Id", session.trackingId)
-            }.build()
+            val keypair = keypairRepository.getById(session!!.keypairId)!!
+
+            val deviceIdValue = session.deviceId.toString()
+
+
+            val newRequest = if (!request.url.toString().contains("/api/v1/auth/account/reset/device")) {
+                val privateKey = keyFactory.generatePrivate(
+                    PKCS8EncodedKeySpec(keypair.privateKey)
+                )
+                val requestBodyValue = request.body.asString()
+
+                val signature = ApiRequestSignerUtil.sign(
+                    "$timestamp.$requestBodyValue",
+                    privateKey,
+                    SIGN_ALGORITHM
+                )
+
+                chain.request().newBuilder().apply {
+                    addHeader("X-Zeta-Device-Id", deviceIdValue)
+                    addHeader("X-Zeta-Timestamp", timestamp)
+                    addHeader("X-Zeta-Signature", signature!!)
+                    addHeader("X-Zeta-Tracking-Id", session.trackingId)
+                    removeHeader(HEADER_SESSION_ID)
+                }.build()
+            } else {
+                chain.request().newBuilder().apply {
+                    addHeader("X-Zeta-Device-Id", deviceIdValue)
+                    addHeader("X-Zeta-Tracking-Id", session.trackingId)
+                }.build()
+            }
+
+            return chain.proceed(newRequest)
+        } catch (ex: Exception) {
+            return chain.proceed(chain.request())
         }
-
-        return chain.proceed(newRequest)
     }
 
     private fun RequestBody?.asString(): String {
