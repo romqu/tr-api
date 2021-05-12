@@ -9,8 +9,8 @@ class ResponseDto<T>(
 
     companion object {
         fun <T> success(data: T) = ResponseDto(data, emptyList())
-        fun failure(errors: List<ErrorDto>) = ResponseDto(null, errors)
-        fun failure(error: ErrorDto) = ResponseDto(null, listOf(error))
+        fun <T> failure(errors: List<ErrorDto>): ResponseDto<T> = ResponseDto(null, errors)
+        fun <T> failure(error: ErrorDto): ResponseDto<T> = ResponseDto(null, listOf(error))
 
     }
 
