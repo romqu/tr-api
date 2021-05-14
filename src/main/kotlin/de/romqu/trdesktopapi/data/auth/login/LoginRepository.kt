@@ -14,6 +14,6 @@ class LoginRepository(
 ): ApiCall by apiCallDelegate {
 
     suspend fun login(trDto: LoginOutTrDto, sessionId: UUID): Result<ApiCallError, LoginInTrDto> =
-        makeApiCallWith { api.login(trDto, sessionId.toString()) }
+        makeApiCall { api.login(trDto, sessionId.toString()) }
 
 }

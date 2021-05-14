@@ -8,6 +8,7 @@ import de.romqu.trdesktopapi.data.auth.login.LoginInTrDto
 import de.romqu.trdesktopapi.data.auth.login.LoginOutTrDto
 import de.romqu.trdesktopapi.data.auth.login.LoginRepository
 import de.romqu.trdesktopapi.data.auth.session.SessionRepository
+import de.romqu.trdesktopapi.data.shared.ApiCallError
 import de.romqu.trdesktopapi.public_.tables.pojos.KeypairEntity
 import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity
 import de.romqu.trdesktopapi.rest.login.LoginInDto
@@ -28,10 +29,12 @@ class LoginService(
     suspend fun execute(dto: LoginInDto, authHeader: String?): Result<Error, SessionEntity> =
         maybeCreateSession(authHeader)
             .login(dto.phoneNumber.toLong(), dto.pinNumber.toInt())
-            .doOn(
-                success = { updateSessionWithTokens(it.dto, it.session) },
-                failure = { maybeResetDevice(it, dto) }
+            .updateSessionWithTokens()
+            .doIfFailureElseContinue(
+                { it is Error.UserIsLoggedIn },
+                { maybeResetDevice(it, dto) }
             )
+
 
     private fun maybeCreateSession(
         authHeader: String?,
@@ -68,7 +71,13 @@ class LoginService(
             ), session.uuidId
         ).map { dto ->
             LoginOut(session, dto)
-        }.mapError { Error.UserIsLoggedIn(session) }
+        }.mapError { apiError ->
+            when (apiError) {
+                is ApiCallError.BadRequest -> Error.AccountDoesNotExist
+                ApiCallError.Unauthorized -> Error.UserIsLoggedIn(session)
+                else -> Error.AccountDoesNotExist
+            }
+        }
 
     }
 
@@ -77,18 +86,16 @@ class LoginService(
         val dto: LoginInTrDto,
     )
 
-    private fun updateSessionWithTokens(
-        trDto: LoginInTrDto,
-        session: SessionEntity,
-    ): Result<Error, SessionEntity> {
-        val updatedSession = with(session) {
+    private fun Result<Error, LoginOut>.updateSessionWithTokens(
+    ): Result<Error, SessionEntity> = map { loginOut ->
+        val updatedSession = with(loginOut.session) {
             SessionEntity(
                 id,
                 uuidId,
                 deviceId,
-                trDto.sessionToken.token,
-                trDto.refreshToken.token,
-                trDto.trackingId.toString(),
+                loginOut.dto.sessionToken.token,
+                loginOut.dto.refreshToken.token,
+                loginOut.dto.trackingId.toString(),
                 null,
                 keypairId,
             )

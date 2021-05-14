@@ -19,7 +19,7 @@ class ResetDeviceRepository(
         dto: RequestResetDeviceOutDto,
         sessionId: UUID,
     ): Result<ApiCallError, RequestResetDeviceInDto> =
-        makeApiCallWith { api.requestReset(dto, sessionId.toString()) }
+        makeApiCall { api.requestReset(dto, sessionId.toString()) }
 
 
     suspend fun resetDevice(
@@ -27,5 +27,5 @@ class ResetDeviceRepository(
         sessionId: UUID,
         processId: String,
     ): Result<ApiCallError, Unit> =
-        makeApiCallWith { api.reset(dto, processId, sessionId.toString()) }
+        makeApiCall { api.reset(dto, processId, sessionId.toString()) }
 }

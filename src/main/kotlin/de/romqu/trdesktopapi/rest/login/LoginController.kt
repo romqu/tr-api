@@ -37,7 +37,8 @@ class LoginController(
                         Error.InvalidSession ->
                             ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                                 .body(ResponseDto.failure(ErrorDto(type = "", message = "")))
-                        Error.AccountDoesNotExist -> ResponseEntity.badRequest().build()
+                        Error.AccountDoesNotExist -> ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(ResponseDto.failure(ErrorDto("", "Account does not Exist")))
                         Error.CouldNotResetDevice -> ResponseEntity.badRequest().build()
                         is Error.UserIsLoggedIn -> ResponseEntity.badRequest().build()
                     }

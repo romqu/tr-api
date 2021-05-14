@@ -17,6 +17,6 @@ class AccountRepository(
         dto: AuthenticateAccountOutDto,
         sessionId: UUID,
     ): Result<ApiCallError, Unit> =
-        makeApiCallWith { api.authenticate(dto, sessionId.toString()) }
+        makeApiCall { api.authenticate(dto, sessionId.toString()) }
 
 }

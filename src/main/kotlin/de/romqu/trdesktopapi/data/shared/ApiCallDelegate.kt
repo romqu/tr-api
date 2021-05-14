@@ -8,7 +8,7 @@ import retrofit2.Response
 import java.io.IOException
 
 interface ApiCall {
-    suspend fun <S : Any> makeApiCallWith(
+    suspend fun <S : Any> makeApiCall(
         call: suspend () -> Response<S>,
     ): Result<ApiCallError, S>
 }
@@ -18,7 +18,7 @@ class ApiCallDelegate(
     private val objectMapper: ObjectMapper
 ) : ApiCall {
 
-    override suspend fun <S : Any> makeApiCallWith(
+    override suspend fun <S : Any> makeApiCall(
         call: suspend () -> Response<S>,
     ): Result<ApiCallError, S> {
         return try {
