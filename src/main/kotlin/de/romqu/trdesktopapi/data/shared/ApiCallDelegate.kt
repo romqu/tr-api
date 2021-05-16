@@ -1,6 +1,7 @@
 package de.romqu.trdesktopapi.data.shared
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import de.romqu.trdesktopapi.shared.Result
 import org.springframework.http.HttpStatus
@@ -52,10 +53,10 @@ class ApiCallDelegate(
                         val apiCallErrorsInDto = if (errorBody != null) {
                             objectMapper.readValue(
                                 errorBody.byteStream(),
-                                ApiCallErrorsInDto::class.java
+                                object : TypeReference<ApiCallErrorsInDto<RetryMeta>>() {}
                             )
 
-                        } else ApiCallErrorsInDto<RetryMeta>()
+                        } else ApiCallErrorsInDto()
 
                         Result.Failure(
                             ApiCallError.BadRequest(apiCallErrorsInDto)
@@ -78,7 +79,7 @@ class ApiCallDelegate(
 
 sealed class ApiCallError {
     object Unauthorized : ApiCallError()
-    class BadRequest(val dto: ApiCallErrorsInDto<Any>) : ApiCallError()
+    class BadRequest<T>(val dto: ApiCallErrorsInDto<T>) : ApiCallError()
     class TooManyRequests(val dto: ApiCallErrorsInDto<RetryMeta>) : ApiCallError()
     class UndefinedNetworkError(val message: String) : ApiCallError()
     class NoNetworkError(val message: String) : ApiCallError()

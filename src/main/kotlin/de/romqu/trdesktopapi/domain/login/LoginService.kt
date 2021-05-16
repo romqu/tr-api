@@ -114,7 +114,7 @@ class LoginService(
             LoginOut(session, dto)
         }.mapError { apiError ->
             when (apiError) {
-                is ApiCallError.BadRequest -> Error.AccountDoesNotExist
+                is ApiCallError.BadRequest<*> -> Error.AccountDoesNotExist
                 ApiCallError.Unauthorized -> Error.UserIsLoggedIn(session)
                 else -> Error.AccountDoesNotExist
             }
