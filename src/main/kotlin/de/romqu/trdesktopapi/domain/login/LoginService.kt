@@ -38,7 +38,7 @@ class LoginService(
             .updateSessionWithTokens()
             .doIfFailureElseContinue(
                 { it is Error.UserIsLoggedIn },
-                { maybeResetDevice(it, dto) }
+                { maybeRequestResetDevice(it, dto) }
             )
 
 
@@ -148,7 +148,7 @@ class LoginService(
         return Success(sessionRepository.update(updatedSession))
     }
 
-    private suspend fun maybeResetDevice(
+    private suspend fun maybeRequestResetDevice(
         error: Error,
         dto: LoginInDto,
     ) = when (error) {
@@ -167,7 +167,7 @@ class LoginService(
         resetDeviceRepository.requestResetDevice(RequestResetDeviceOutDto(
             "+49$phoneNumber", pinNumber
         ), session.uuidId)
-            .mapError { Error.CouldNotResetDevice }
+            .mapError { Error.CouldNotRequestResetDevice }
 
     private fun Result<Error, RequestResetDeviceInDto>.updateSessionWithResetProcessId(
         session: SessionEntity,
@@ -200,6 +200,6 @@ class LoginService(
         object InvalidSession : Error()
         class UserIsLoggedIn(val session: SessionEntity) : Error()
         object AccountDoesNotExist : Error()
-        object CouldNotResetDevice : Error()
+        object CouldNotRequestResetDevice : Error()
     }
 }

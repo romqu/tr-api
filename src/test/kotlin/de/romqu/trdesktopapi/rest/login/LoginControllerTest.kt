@@ -1,6 +1,7 @@
 package de.romqu.trdesktopapi.rest.login
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import de.romqu.trdesktopapi.rest.resetdevice.ResetDeviceController
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -28,7 +29,7 @@ internal class LoginControllerTest {
         val dtoAsString = objectMapper.writeValueAsString(dto)
 
         val result = mvc.perform(
-            MockMvcRequestBuilders.post(LoginController.URL_PATH)
+            MockMvcRequestBuilders.post(ResetDeviceController.URL_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 //.header(HttpHeaders.AUTHORIZATION, "Bearer a4e0c94a-35b7-4c5e-aea1-7ec73c08405e")
                 .content(dtoAsString)

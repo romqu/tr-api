@@ -2,6 +2,7 @@ package de.romqu.trdesktopapi.rest.login
 
 import de.romqu.trdesktopapi.domain.login.LoginService
 import de.romqu.trdesktopapi.domain.login.LoginService.Error
+import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity
 import de.romqu.trdesktopapi.rest.shared.ResponseDto
 import de.romqu.trdesktopapi.rest.shared.errorhandling.ErrorDto
 import org.springframework.http.HttpHeaders
@@ -16,7 +17,7 @@ import javax.validation.Valid
 
 @RestController
 class LoginController(
-    private val loginService: LoginService,
+    private val service: LoginService,
 ) {
     companion object {
         const val URL_PATH = "/v1/auth/login"
@@ -27,27 +28,25 @@ class LoginController(
         @Header(HttpHeaders.AUTHORIZATION, required = false) authHeader: String?,
         @RequestBody @Valid dto: LoginInDto,
     ): ResponseEntity<ResponseDto<LoginOutDto>> =
-        loginService.execute(dto, authHeader)
-            .doOn(
-                success = {
-                    ResponseEntity.ok(ResponseDto.success(LoginOutDto(it.uuidId)))
-                },
-                failure = { error ->
-                    when (error) {
-                        Error.InvalidSession ->
-                            ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                                .body(ResponseDto.failure(ErrorDto(type = "", message = "")))
-                        Error.AccountDoesNotExist -> ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                            .body(ResponseDto.failure(ErrorDto("", "Account does not Exist")))
-                        Error.CouldNotResetDevice -> ResponseEntity.badRequest().build()
-                        is Error.UserIsLoggedIn -> ResponseEntity.badRequest().build()
-                        Error.CouldNotHashPhoneNumber -> TODO()
-                        Error.SessionByHeaderNotFound -> TODO()
-                        is Error.SessionByHeaderPhoneNumberHashNotFound -> TODO()
-                    }
+        service.execute(dto, authHeader)
+            .doOn(::success, ::failure)
 
-                }
-            )
+    private fun success(it: SessionEntity) =
+        ResponseEntity.ok(ResponseDto.success(LoginOutDto(it.uuidId)))
+
+    private fun failure(error: Error): ResponseEntity<ResponseDto<LoginOutDto>> =
+        when (error) {
+            Error.InvalidSession ->
+                ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ResponseDto.failure(ErrorDto(type = "", message = "")))
+            Error.AccountDoesNotExist -> ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ResponseDto.failure(ErrorDto("", "Account does not Exist")))
+            Error.CouldNotRequestResetDevice -> ResponseEntity.badRequest().build()
+            is Error.UserIsLoggedIn -> ResponseEntity.badRequest().build()
+            Error.CouldNotHashPhoneNumber -> TODO()
+            Error.SessionByHeaderNotFound -> TODO()
+            is Error.SessionByHeaderPhoneNumberHashNotFound -> TODO()
+        }
 
 }
 

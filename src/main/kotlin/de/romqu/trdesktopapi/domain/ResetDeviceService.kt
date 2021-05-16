@@ -8,6 +8,8 @@ import de.romqu.trdesktopapi.data.shared.ApiCallError
 import de.romqu.trdesktopapi.data.shared.extension.asX962
 import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity
 import de.romqu.trdesktopapi.shared.Result
+import de.romqu.trdesktopapi.shared.map
+import de.romqu.trdesktopapi.shared.mapError
 import org.springframework.stereotype.Service
 
 @Service
@@ -20,7 +22,7 @@ class ResetDeviceService(
     suspend fun execute(
         code: String,
         session: SessionEntity,
-    ): Result<ApiCallError, SessionEntity> =
+    ): Result<Error, Unit> =
         getDeviceKey(session)
             .resetDevice(code, session)
             .resetProcessIdFromSession(session)
@@ -39,7 +41,7 @@ class ResetDeviceService(
 
     private fun Result<ApiCallError, Unit>.resetProcessIdFromSession(
         session: SessionEntity,
-    ): Result<ApiCallError, SessionEntity> {
+    ): Result<Error, Unit> {
 
         val updatedSession = with(session) {
             SessionEntity(
@@ -59,6 +61,10 @@ class ResetDeviceService(
             Result.Success(sessionRepository.update(updatedSession))
         }, {
             Result.Success(sessionRepository.update(updatedSession))
-        })
+        }).map { }.mapError { Error.CouldNotResetDevice }
+    }
+
+    sealed class Error {
+        object CouldNotResetDevice : Error()
     }
 }
