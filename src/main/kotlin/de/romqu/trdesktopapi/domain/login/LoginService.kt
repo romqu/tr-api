@@ -47,7 +47,9 @@ class LoginService(
         phoneNumber: String,
     ): Result<Error, SessionEntity> =
         getSessionByAuthHeaderTask.execute(authHeader)
-            .mapError { Error.SessionByHeaderNotFound }
+            .mapError<GetSessionByAuthHeaderTask.Error, SessionEntity, Error> {
+                Error.SessionByHeaderNotFound
+            }
             .doIfFailureElseContinue {
                 getPhoneNumberHash(phoneNumber)
                     .getSessionByPhoneNumberHash()
