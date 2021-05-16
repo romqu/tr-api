@@ -25,11 +25,11 @@ class WebSocketModule {
         Caffeine.newBuilder().maximumSize(100).build()
 
     @Bean
-    fun getDtoTypeCache(): Cache<String, WebsocketDtoType> = Caffeine.newBuilder().build()
+    fun subscriptionDtoTypeCache(): Cache<String, WebSocketDtoType> = Caffeine.newBuilder().build()
 
 
     @Bean
-    fun lastSubscriptionNumberCache(): Cache<String, Int> = Caffeine.newBuilder().build()
+    fun subscriptionNumberCache(): Cache<String, Int> = Caffeine.newBuilder().build()
 
     @Bean
     fun portfolioLightHistoryBroadcastStream(): MutableSharedFlow<PortfolioAggregateHistoryLightInDto> =
@@ -39,10 +39,10 @@ class WebSocketModule {
     fun authErrorInDtoBroadcastStream(): MutableSharedFlow<AuthErrorInDto> = MutableSharedFlow()
 
     @Bean
-    fun websocketMessageStream(): MutableSharedFlow<WebsocketRepository.WebsocketMessageInDto> = MutableSharedFlow()
+    fun webSocketMessageStream(): MutableSharedFlow<WebSocketRepository.WebSocketMessageInDto> = MutableSharedFlow()
 
     @Bean(WEB_SOCKET_CLIENT)
-    fun okHttpClientWebsocket(
+    fun okHttpClientWebSocket(
     ): OkHttpClient {
 
         val sslContext = SSLContext.getInstance("SSL")
@@ -50,7 +50,7 @@ class WebSocketModule {
         sslContext.init(null, trustAllCerts, java.security.SecureRandom())
         val sslSocketFactory = sslContext.socketFactory
 
-        val hostname = "localhost" /*127.0.0.1*/
+        val hostname = "localhost"
         val port = 8081
         val proxy = Proxy(
             Proxy.Type.HTTP,

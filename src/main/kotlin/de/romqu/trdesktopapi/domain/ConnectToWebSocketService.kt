@@ -1,17 +1,17 @@
 package de.romqu.trdesktopapi.domain
 
-import de.romqu.trdesktopapi.data.websocket.WebsocketRepository
+import de.romqu.trdesktopapi.data.websocket.WebSocketRepository
 import de.romqu.trdesktopapi.data.websocket.connect.ConnectOutDto
 import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity
 
 class ConnectToWebSocketService(
-    private val websocketRepository: WebsocketRepository,
+    private val webSocketRepository: WebSocketRepository,
 ) {
 
     fun execute(session: SessionEntity) {
-        if (!websocketRepository.hasConnection(session.uuidId)) {
-            val websocket = websocketRepository.create(session.uuidId)
-            websocketRepository.save(session.uuidId, websocket)
+        if (!webSocketRepository.hasConnection(session.uuidId)) {
+            val websocket = webSocketRepository.create(session.uuidId)
+            webSocketRepository.save(session.uuidId, websocket)
             val connectOutDto = ConnectOutDto(
                 clientId = "",
                 clientVersion = "Xiaomi Mi A3",
@@ -20,7 +20,7 @@ class ConnectToWebSocketService(
                 platformId = "android",
                 platformVersion = 30
             )
-            websocketRepository.connect(session.uuidId, connectOutDto, websocket)
+            webSocketRepository.connect(session.uuidId, connectOutDto, websocket)
         }
     }
 }

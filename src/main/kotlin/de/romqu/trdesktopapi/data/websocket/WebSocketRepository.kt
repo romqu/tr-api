@@ -16,21 +16,21 @@ import java.util.*
 const val URL_WEBSOCKET = "wss://api.traderepublic.com"
 
 @Repository
-class WebsocketRepository(
+class WebSocketRepository(
     @Qualifier("WEB_SOCKET_CLIENT") private val client: OkHttpClient,
     private val cache: Cache<String, WebSocket>,
-    private val dtoTypeCache: Cache<String, WebsocketDtoType>,
-    private val lastSubscriptionNumberCache: Cache<String, Int>,
+    private val subscriptionNumberCache: Cache<String, Int>,
+    private val subscriptionDtoTypeCache: Cache<String, WebSocketDtoType>,
     private val objectMapper: ObjectMapper,
     private val authErrorStream: MutableSharedFlow<AuthErrorInDto>,
-    private val websocketMessageStream: MutableSharedFlow<WebsocketMessageInDto>,
+    private val webSocketMessageStream: MutableSharedFlow<WebSocketMessageInDto>,
 ) {
-    private val websocketBroadcastListener = WebsocketBroadcastListener()
+    private val webSocketBroadcastListener = WebSocketBroadcastListener()
 
-    class WebsocketMessageInDto(
+    class WebSocketMessageInDto(
         val sessionUuid: UUID,
         val message: String,
-        val dtoType: WebsocketDtoType,
+        val dtoType: WebSocketDtoType,
     )
 
     fun hasConnection(sessionId: UUID) = cache.getIfPresent(sessionId.toString()) != null
@@ -41,7 +41,7 @@ class WebsocketRepository(
             .url(URL_WEBSOCKET)
             .build()
 
-        return client.newWebSocket(request, websocketBroadcastListener)
+        return client.newWebSocket(request, webSocketBroadcastListener)
     }
 
     fun save(id: UUID, webSocket: WebSocket) {
@@ -52,24 +52,43 @@ class WebsocketRepository(
         cache.invalidate(id.toString())
     }
 
+    fun getSubscriptionNumber(sessionId: String): Int? =
+        subscriptionNumberCache.getIfPresent(sessionId)
+
+
+    fun updateSubscriptionNumber(sessionId: String, number: Int) {
+        subscriptionNumberCache.put(sessionId, number)
+    }
+
+    fun getSubscriptionDtoType(sessionId: String): Int? =
+        subscriptionNumberCache.getIfPresent(sessionId)
+
+
+    fun saveSubscriptionDtoType(
+        sessionId: String,
+        subscriptionNumber: Int,
+        dtoType: WebSocketDtoType,
+    ) {
+        subscriptionDtoTypeCache.put("$sessionId$subscriptionNumber", dtoType)
+    }
+
+
     fun subscribe(sessionId: String, outDto: WebSocketOutDto) {
-        val subscriptionNumber = lastSubscriptionNumberCache.get(sessionId) { 0 }.plus(1)
-        val subscriptionRequest = objectMapper.writeValueAsString(outDto)
+        val subscriptionNumber = getSubscriptionNumber(sessionId)!!.plus(1)
 
-        dtoTypeCache.put("$sessionId$subscriptionNumber", outDto.dtoType)
-        cache.getIfPresent(sessionId)?.send(subscriptionRequest)
+        saveSubscriptionDtoType(sessionId, subscriptionNumber, outDto.dtoType)
+        cache.getIfPresent(sessionId)?.send(objectMapper.writeValueAsString(outDto))
 
-        lastSubscriptionNumberCache.put(sessionId, subscriptionNumber)
+        updateSubscriptionNumber(sessionId, subscriptionNumber)
     }
 
     fun connect(sessionId: UUID, dto: ConnectOutDto, webSocket: WebSocket) {
-        dtoTypeCache.put("${sessionId}0", dto.dtoType)
-        val connectRequest = "connect 22 ${objectMapper.writeValueAsString(dto)}"
-        webSocket.send(connectRequest)
+        saveSubscriptionDtoType(sessionId.toString(), 0, dto.dtoType)
+        webSocket.send("connect 22 ${objectMapper.writeValueAsString(dto)}")
     }
 
 
-    inner class WebsocketBroadcastListener : WebSocketListener() {
+    inner class WebSocketBroadcastListener : WebSocketListener() {
 
         private val subscriptionNumberMatcher = Regex("^[0-9]*")
 
@@ -81,11 +100,11 @@ class WebsocketRepository(
 
             val sessionUuid = webSocket.request().header(HEADER_SESSION_ID)
             val subscriptionNumber = subscriptionNumberMatcher.find(text)
-            val dtoType = dtoTypeCache.getIfPresent("$sessionUuid$subscriptionNumber")
+            val dtoType = subscriptionDtoTypeCache.getIfPresent("$sessionUuid$subscriptionNumber")
 
             if (sessionUuid != null && dtoType != null) {
-                websocketMessageStream.tryEmit(
-                    WebsocketMessageInDto(
+                webSocketMessageStream.tryEmit(
+                    WebSocketMessageInDto(
                         UUID.fromString(sessionUuid), text, dtoType
                     ),
                 )
@@ -97,6 +116,6 @@ class WebsocketRepository(
     }
 }
 
-enum class WebsocketDtoType {
+enum class WebSocketDtoType {
     CONNECT, PORTFOLIO_HISTORY_LIGHT
 }

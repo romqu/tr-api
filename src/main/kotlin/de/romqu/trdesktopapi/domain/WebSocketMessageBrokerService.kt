@@ -1,8 +1,8 @@
 package de.romqu.trdesktopapi.domain
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import de.romqu.trdesktopapi.data.websocket.WebsocketDtoType
-import de.romqu.trdesktopapi.data.websocket.WebsocketRepository
+import de.romqu.trdesktopapi.data.websocket.WebSocketDtoType
+import de.romqu.trdesktopapi.data.websocket.WebSocketRepository
 import de.romqu.trdesktopapi.data.websocket.portfolio.PortfolioAggregateHistoryLightInDto
 import de.romqu.trdesktopapi.shared.CO_SCOPE_APPLICATION
 import kotlinx.coroutines.CoroutineScope
@@ -14,8 +14,8 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 
 @Service
-class WebsocketMessageBrokerService(
-    private val websocketMessageStream: Flow<WebsocketRepository.WebsocketMessageInDto>,
+class WebSocketMessageBrokerService(
+    private val webSocketMessageStream: Flow<WebSocketRepository.WebSocketMessageInDto>,
     private val objectMapper: ObjectMapper,
     private val portfolioAggregateHistoryLightBroker: MutableSharedFlow<PortfolioAggregateHistoryLightInDto>,
     @Qualifier(CO_SCOPE_APPLICATION) private val scope: CoroutineScope,
@@ -32,7 +32,7 @@ class WebsocketMessageBrokerService(
     }
 
     private suspend fun parseAndDistribute() {
-        websocketMessageStream.collect { dto ->
+        webSocketMessageStream.collect { dto ->
             val dtoValue = bodyMatcher.find(dto.message)?.value
             val dtoType = dto.dtoType
 
@@ -55,9 +55,9 @@ class WebsocketMessageBrokerService(
                     )
 
                 when (dtoType) {
-                    WebsocketDtoType.CONNECT -> {
+                    WebSocketDtoType.CONNECT -> {
                     }
-                    WebsocketDtoType.PORTFOLIO_HISTORY_LIGHT -> portfolioAggregateHistoryLightBroker.tryEmit(
+                    WebSocketDtoType.PORTFOLIO_HISTORY_LIGHT -> portfolioAggregateHistoryLightBroker.tryEmit(
                         objectMapper.readValue(dtoValueToRead, PortfolioAggregateHistoryLightInDto::class.java)
                     )
                 }

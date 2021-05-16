@@ -1,7 +1,7 @@
 package de.romqu.trdesktopapi.data.websocket.connect
 
+import de.romqu.trdesktopapi.data.websocket.WebSocketDtoType
 import de.romqu.trdesktopapi.data.websocket.WebSocketOutDto
-import de.romqu.trdesktopapi.data.websocket.WebsocketDtoType
 import java.util.*
 
 class ConnectOutDto(
@@ -12,6 +12,6 @@ class ConnectOutDto(
     val platformId: String,
     val platformVersion: Int,
 ) : WebSocketOutDto {
-    override val dtoType: WebsocketDtoType
-        get() = WebsocketDtoType.CONNECT
+    override val dtoType: WebSocketDtoType
+        get() = WebSocketDtoType.CONNECT
 }
