@@ -1,5 +1,6 @@
-package de.romqu.trdesktopapi.domain
+package de.romqu.trdesktopapi.domain.login
 
+import de.mkammerer.argon2.Argon2Advanced
 import de.romqu.trdesktopapi.data.KeypairRepository
 import de.romqu.trdesktopapi.data.auth.account.resetdevice.ResetDeviceRepository
 import de.romqu.trdesktopapi.data.auth.account.resetdevice.request.RequestResetDeviceInDto
@@ -9,10 +10,14 @@ import de.romqu.trdesktopapi.data.auth.login.LoginOutTrDto
 import de.romqu.trdesktopapi.data.auth.login.LoginRepository
 import de.romqu.trdesktopapi.data.auth.session.SessionRepository
 import de.romqu.trdesktopapi.data.shared.ApiCallError
+import de.romqu.trdesktopapi.domain.CreateKeypairTask
+import de.romqu.trdesktopapi.domain.GetSessionByAuthHeaderTask
 import de.romqu.trdesktopapi.public_.tables.pojos.KeypairEntity
 import de.romqu.trdesktopapi.public_.tables.pojos.SessionEntity
 import de.romqu.trdesktopapi.rest.login.LoginInDto
 import de.romqu.trdesktopapi.shared.*
+import de.romqu.trdesktopapi.shared.Result.Failure
+import de.romqu.trdesktopapi.shared.Result.Success
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -24,10 +29,11 @@ class LoginService(
     private val createKeypairTask: CreateKeypairTask,
     private val keypairRepository: KeypairRepository,
     private val getSessionByAuthHeaderTask: GetSessionByAuthHeaderTask,
+    private val argon2: Argon2Advanced,
 ) {
 
     suspend fun execute(dto: LoginInDto, authHeader: String?): Result<Error, SessionEntity> =
-        maybeCreateSession(authHeader)
+        maybeCreateSession(authHeader, dto.phoneNumber)
             .login(dto.phoneNumber.toLong(), dto.pinNumber.toInt())
             .updateSessionWithTokens()
             .doIfFailureElseContinue(
@@ -38,13 +44,47 @@ class LoginService(
 
     private fun maybeCreateSession(
         authHeader: String?,
+        phoneNumber: String,
     ): Result<Error, SessionEntity> =
         getSessionByAuthHeaderTask.execute(authHeader)
-            .doIfFailureElseContinue { Result.Success(createSession()) }
-            .mapError { Error.InvalidSession }
+            .mapError { Error.SessionByHeaderNotFound }
+            .doIfFailureElseContinue {
+                getPhoneNumberHash(phoneNumber)
+                    .getSessionByPhoneNumberHash()
+            }
+            .doIfFailureElseContinue(
+                { it is Error.SessionByHeaderPhoneNumberHashNotFound },
+                {
+                    Success(createSession((
+                            it as Error.SessionByHeaderPhoneNumberHashNotFound).phoneNumberHash
+                    ))
+                })
+
+    private fun getPhoneNumberHash(phoneNumber: String): Result<Error, String> =
+        try {
+            val hash = argon2.hash(
+                1,
+                1024,
+                1,
+                phoneNumber.toCharArray(),
+                Charsets.UTF_8,
+                "S43iZLEo".toByteArray()
+            )
+            Success(hash)
+        } catch (ex: Exception) {
+            Failure(Error.CouldNotHashPhoneNumber)
+        }
+
+    private fun Result<Error, String>.getSessionByPhoneNumberHash():
+            Result<Error, SessionEntity> = flatMap { hash ->
+        val session = sessionRepository.getByPhoneNumberHash(hash)
+
+        if (session != null) Success(session)
+        else Failure(Error.SessionByHeaderPhoneNumberHashNotFound(hash))
+    }
 
 
-    private fun createSession(): SessionEntity {
+    private fun createSession(phoneNumberHash: String): SessionEntity {
         val keypair = createKeypairTask.execute()
         val keypairEntity = KeypairEntity(0, keypair.private.encoded, keypair.public.encoded)
         val savedKeypairEntity = keypairRepository.save(keypairEntity)
@@ -52,6 +92,7 @@ class LoginService(
             0,
             UUID.randomUUID(),
             UUID.randomUUID(),
+            phoneNumberHash,
             "",
             "",
             "",
@@ -93,6 +134,7 @@ class LoginService(
                 id,
                 uuidId,
                 deviceId,
+                phoneNumberHash,
                 loginOut.dto.sessionToken.token,
                 loginOut.dto.refreshToken.token,
                 loginOut.dto.trackingId.toString(),
@@ -101,7 +143,7 @@ class LoginService(
             )
         }
 
-        return Result.Success(sessionRepository.update(updatedSession))
+        return Success(sessionRepository.update(updatedSession))
     }
 
     private suspend fun maybeResetDevice(
@@ -112,7 +154,7 @@ class LoginService(
             requestDeviceReset(dto.phoneNumber.toLong(), dto.pinNumber.toInt(), error.session)
                 .updateSessionWithResetProcessId(error.session)
         }
-        else -> Result.Failure(Error.AccountDoesNotExist)
+        else -> Failure(Error.AccountDoesNotExist)
     }
 
     private suspend fun requestDeviceReset(
@@ -134,6 +176,7 @@ class LoginService(
                 id,
                 uuidId,
                 deviceId,
+                phoneNumberHash,
                 token,
                 refreshToken,
                 trackingId,
@@ -146,10 +189,15 @@ class LoginService(
     }
 
     sealed class Error {
+        object SessionByHeaderNotFound : Error()
+        class SessionByHeaderPhoneNumberHashNotFound(
+            val phoneNumberHash: String,
+        ) : Error()
+
+        object CouldNotHashPhoneNumber : Error()
         object InvalidSession : Error()
         class UserIsLoggedIn(val session: SessionEntity) : Error()
         object AccountDoesNotExist : Error()
         object CouldNotResetDevice : Error()
-
     }
 }

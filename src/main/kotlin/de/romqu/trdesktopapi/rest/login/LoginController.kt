@@ -1,7 +1,7 @@
 package de.romqu.trdesktopapi.rest.login
 
-import de.romqu.trdesktopapi.domain.LoginService
-import de.romqu.trdesktopapi.domain.LoginService.Error
+import de.romqu.trdesktopapi.domain.login.LoginService
+import de.romqu.trdesktopapi.domain.login.LoginService.Error
 import de.romqu.trdesktopapi.rest.shared.ResponseDto
 import de.romqu.trdesktopapi.rest.shared.errorhandling.ErrorDto
 import org.springframework.http.HttpHeaders
@@ -41,6 +41,9 @@ class LoginController(
                             .body(ResponseDto.failure(ErrorDto("", "Account does not Exist")))
                         Error.CouldNotResetDevice -> ResponseEntity.badRequest().build()
                         is Error.UserIsLoggedIn -> ResponseEntity.badRequest().build()
+                        Error.CouldNotHashPhoneNumber -> TODO()
+                        Error.SessionByHeaderNotFound -> TODO()
+                        is Error.SessionByHeaderPhoneNumberHashNotFound -> TODO()
                     }
 
                 }

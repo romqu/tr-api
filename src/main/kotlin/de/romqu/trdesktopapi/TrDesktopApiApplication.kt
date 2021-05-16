@@ -4,8 +4,8 @@ package de.romqu.trdesktopapi
 import com.fasterxml.jackson.databind.ObjectMapper
 import de.romqu.trdesktopapi.data.auth.session.SessionRepository
 import de.romqu.trdesktopapi.data.shared.di.WEB_SOCKET_CLIENT
-import de.romqu.trdesktopapi.domain.LoginService
 import de.romqu.trdesktopapi.domain.ResetDeviceService
+import de.romqu.trdesktopapi.domain.login.LoginService
 import de.romqu.trdesktopapi.rest.login.LoginInDto
 import de.romqu.trdesktopapi.shared.map
 import kotlinx.coroutines.GlobalScope

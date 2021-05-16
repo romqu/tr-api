@@ -28,6 +28,7 @@ class RefreshSessionTokenService(
                     uuidId,
                     deviceId,
                     sessionTokenInDto.sessionToken.token,
+                    phoneNumberHash,
                     refreshToken,
                     trackingId,
                     resetProcessId,

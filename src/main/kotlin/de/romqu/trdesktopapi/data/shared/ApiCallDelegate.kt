@@ -1,5 +1,6 @@
 package de.romqu.trdesktopapi.data.shared
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import de.romqu.trdesktopapi.shared.Result
 import org.springframework.http.HttpStatus
@@ -15,7 +16,7 @@ interface ApiCall {
 
 @Component
 class ApiCallDelegate(
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
 ) : ApiCall {
 
     override suspend fun <S : Any> makeApiCall(
@@ -35,11 +36,26 @@ class ApiCallDelegate(
                         val errorBody = response.errorBody()
 
                         val apiCallErrorsInDto = if (errorBody != null) {
-                                objectMapper.readValue(
-                                    errorBody.byteStream(),
-                                    ApiCallErrorsInDto::class.java
-                                )
-                        } else ApiCallErrorsInDto()
+                            objectMapper.readValue(
+                                errorBody.byteStream(),
+                                ApiCallErrorsInDto::class.java
+                            )
+                        } else ApiCallErrorsInDto<Any>()
+
+                        Result.Failure(
+                            ApiCallError.BadRequest(apiCallErrorsInDto)
+                        )
+                    }
+                    HttpStatus.TOO_MANY_REQUESTS.value() -> {
+                        val errorBody = response.errorBody()
+
+                        val apiCallErrorsInDto = if (errorBody != null) {
+                            objectMapper.readValue(
+                                errorBody.byteStream(),
+                                ApiCallErrorsInDto::class.java
+                            )
+
+                        } else ApiCallErrorsInDto<RetryMeta>()
 
                         Result.Failure(
                             ApiCallError.BadRequest(apiCallErrorsInDto)
@@ -62,18 +78,26 @@ class ApiCallDelegate(
 
 sealed class ApiCallError {
     object Unauthorized : ApiCallError()
-    class BadRequest(val dto: ApiCallErrorsInDto) : ApiCallError()
+    class BadRequest(val dto: ApiCallErrorsInDto<Any>) : ApiCallError()
+    class TooManyRequests(val dto: ApiCallErrorsInDto<RetryMeta>) : ApiCallError()
     class UndefinedNetworkError(val message: String) : ApiCallError()
     class NoNetworkError(val message: String) : ApiCallError()
 }
 
-class ApiCallErrorsInDto(
-    val errors: List<ApiCallErrorInDto> = emptyList()
+class ApiCallErrorsInDto<T>(
+    val errors: List<ApiCallErrorInDto<T>> = emptyList(),
 )
 
-class ApiCallErrorInDto(
+class ApiCallErrorInDto<T>(
     val errorCode: String = "",
-    val errorField: String = "",
-    val errorMessage: String? = "",
-    val meta: String? = "",
+    val errorField: String? = null,
+    val errorMessage: String? = null,
+    val meta: T? = null,
+)
+
+class RetryMeta(
+    @JsonProperty("_meta_type")
+    val metaType: String,
+    val nextAttemptInSeconds: Int,
+    val nextAttemptTimestamp: String,
 )

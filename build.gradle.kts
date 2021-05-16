@@ -49,7 +49,7 @@ dependencies {
     implementation("org.bouncycastle:bcprov-jdk15on:1.68")
 
     implementation("com.github.ben-manes.caffeine:caffeine:3.0.2")
-
+    implementation("de.mkammerer:argon2-jvm-nolibs:2.10.1")
 }
 
 tasks.withType<KotlinCompile> {

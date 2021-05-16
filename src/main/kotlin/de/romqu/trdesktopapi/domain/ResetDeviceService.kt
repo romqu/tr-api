@@ -46,6 +46,7 @@ class ResetDeviceService(
                 id,
                 uuidId,
                 deviceId,
+                phoneNumberHash,
                 token,
                 refreshToken,
                 trackingId,

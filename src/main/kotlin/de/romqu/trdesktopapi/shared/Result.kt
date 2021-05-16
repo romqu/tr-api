@@ -130,17 +130,27 @@ inline fun <S1, S2, F, R> Result<F, S1>.zipWith(
     transform: (S1, S2) -> R,
 ): Result<F, R> = Result.zip(this, result2, transform)
 
-inline fun <F, S, R, F2> Result<F, S>.flatMapError(
+inline fun <F, S, R, F2> Result<F, S>.flatMapWithError(
     transform: (S) -> Result<F2, R>,
     transformError: (F) -> F2,
 ): Result<F2, R> =
     doOn(transform) { Result.Failure(transformError((this as Result.Failure).failure)) }
 
-inline fun <F, S, R, F2> Result<F, S>.mapError(
+inline fun <F, S, F2> Result<F, S>.flatMapError(
+    transformError: (F) -> F2,
+): Result<F2, S> =
+    doOn({ Result.Success(it) }) { Result.Failure(transformError((this as Result.Failure).failure)) }
+
+inline fun <F, S, R, F2> Result<F, S>.mapWithError(
     transform: (S) -> R = { it as R },
     transformError: (F) -> F2,
 ): Result<F2, R> =
-    flatMapError({ Result.Success(transform(it)) }, transformError)
+    flatMapWithError({ Result.Success(transform(it)) }, transformError)
+
+inline fun <F, S, F2> Result<F, S>.mapError(
+    transformError: (F) -> F2,
+): Result<F2, S> =
+    flatMapError(transformError)
 
 
 inline fun <F, S, R> Result<F, S>.asyncFlatMap(

@@ -28,6 +28,9 @@ class SessionRepository(
     fun getByUuid(uuid: String): SessionEntity? =
         dao.fetchOneByUuidIdEntity(UUID.fromString(uuid))
 
+    fun getByPhoneNumberHash(hash: String): SessionEntity? =
+        dao.fetchOneByPhoneNumberHashEntity(hash)
+
     fun save(entity: SessionEntity): SessionEntity {
         val id = db.insertReturningId(
             SESSION,
@@ -35,6 +38,7 @@ class SessionRepository(
                 SESSION.UUID_ID,
                 SESSION.DEVICE_ID,
                 SESSION.KEYPAIR_ID,
+                SESSION.PHONE_NUMBER_HASH,
                 SESSION.TRACKING_ID,
                 SESSION.REFRESH_TOKEN,
                 SESSION.TOKEN,
@@ -43,6 +47,7 @@ class SessionRepository(
                 entity.uuidId,
                 entity.deviceId,
                 entity.keypairId,
+                entity.phoneNumberHash,
                 entity.trackingId,
                 entity.refreshToken,
                 entity.token,
@@ -53,6 +58,7 @@ class SessionRepository(
                 id,
                 uuidId,
                 deviceId,
+                phoneNumberHash,
                 token,
                 refreshToken,
                 trackingId,
